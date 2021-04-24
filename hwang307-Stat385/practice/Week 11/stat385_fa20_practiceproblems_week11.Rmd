@@ -1,0 +1,54 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 11 Practice Problems
+### Created by Prof. Christopher Kinson
+
+Using the sentence about the geese below, address the following in a using regular expression and string manipulation to show code and results of the code as answers to the questions:
+
+```{r}
+library(tidyverse)
+sentence <- "Friends of the Geese are hosting a memorial service Saturday for the 175 geese killed this week by the Urbana Park District in its 'charity harvest.'"
+```
+
+a. Find the number of times the lower case letter "s" appears  
+
+```{r}
+str_count(sentence,"s")
+```
+
+b.  Count the number of times a word begins with the letter "t" 
+
+```{r}
+str_count(sentence,"\\b[T|t]\\w*\\b")
+```
+
+c. Find the number of times any digit between 1-9 appears
+
+```{r}
+str_count(sentence,"[1-9]")
+```
+
+d. Count the number of words that contain the letter "g" (case does not matter).
+
+```{r}
+str_count(sentence,"\\b\\w*[G|g]\\w*\\b")
+```
+
+e. Which words have consecutive characters appearing twice?
+
+```{r}
+str_extract_all(sentence,"\\b\\w*([A-Z|a-z])\\1\\w*\\b")
+```
+
+f. Show only the words excluding punctuation such that each word appears as a row in a matrix. This matrix should have 26 rows and 1 column.
+
+```{r}
+t(str_extract_all(sentence,"\\b\\w+\\b",simplify=TRUE))
+```

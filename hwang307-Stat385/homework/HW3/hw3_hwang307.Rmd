@@ -1,0 +1,119 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 3
+### Due: Monday October 5, 2020 11:59 pm US Central Time
+#### Created by Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+
+**Retrieving your work**
+
+This and all future homework files are written in RMarkdown (.Rmd). The .Rmd file will exist in the `homework` directory within the `course-materials` repo, i.e. `course-materials/homework` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of all course materials and files. After pulling the repo, the homework file will be in the homework directory. You must save the homework file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as hw#_netID.Rmd. For example, my homework 1 file would be saved as hw1_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as hw#_netID.html. For example, my homework 1 file would be saved as hw1_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. When students get stuck on a homework problem, students should ask the question in the Issues page in GitHub. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the provided URLs to access the datasets (if any). Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset` function is never allowed in this course.
+
+1. (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in italic text as the second item. 
+
+   1. Hubert
+   2. *Wang*
+
+2. (Syllabus, Markdown) Students who submit their homework after the official homework solutions have been posted will receive an automatic grade of 50%, i.e. 10 points. Is the preceding statement true or false? Write your answer in bold text.
+
+**False**
+
+3. (Personal interest survey) If I offered a bi-weekly Zoom session on Friday evenings (e.g. 7-8 pm) for students in this course to just hang out and get to know each other, as a social activity since we cannot meet in person, would you be interested in attending? *These social sessions would not be recorded.* Write your answer as Yes or No.
+
+Yes
+
+4. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Writing your own functions) Using RMarkdown, create a custom volume measurement function that will convert 13 imperial (liquid) cups to cubic inches.
+
+```{r}
+volume1 <- function(cups){
+  cups*17.3387
+}
+x <- 13
+volume1(x)
+```
+
+5. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Writing your own functions) Using RMarkdown, create a custom volume measurement function that will convert 3 US customary (dry) teaspoons to milliliters.
+
+```{r}
+volume2 <- function(tspns){
+  tspns*4.92892
+}
+x <- 3
+volume2(x)
+```
+
+6. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Writing your own functions) Using RMarkdown, create one custom user-defined function to determine if 117 is prime or not.
+  
+```{r}
+isprime <- function(numb){
+  ifelse(sum(numb%%(2:(numb-1))==0)==0,paste(numb,"is prime"),paste(numb,"is not prime"))
+}
+x <- 117
+isprime(x)
+```
+
+7. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Writing your own functions) Using RMarkdown, create one custom user-defined function to determine if 769 is prime or not.
+
+```{r}
+isprime <- function(numb){
+  ifelse(sum(numb%%(2:(numb-1))==0)==0,paste(numb,"is prime"),paste(numb,"is not prime"))
+}
+x <- 769
+isprime(x)
+```
+
+8. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions) Place two numeric vectors (named as `x1` and `x2`) into a single matrix named as `matrix1` such that both `x1` and`x2` have 30 elements each. `x1` contains a random sample (from the standard normal statistical distribution) of 30 values such that the values are rounded to be integers. `x2` contains a random sample (not from any statistical distribution) of 30 values between the numbers 1 and 30 such that no values appear more than once. Print the resulting `matrix1`. *There should be only 30 rows in `matrix1`.*
+
+```{r}
+x1 <- round(rnorm(30),0)
+x2 <- sample(1:30,30,replace = FALSE)
+matrix1 <- cbind(x1,x2)
+matrix1
+```
+
+9. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Lists and data frames) Beginning with the vectors `x1` and `x2` in **Problem 4**, convert `x2` into a character vector. Then, place `x1` and `x2` into a single data frame named as `df1`. Print the resulting `df1`. *There should be only 30 rows in `df1`.*
+
+```{r}
+x2 <- as.character(x2)
+df1 <- data.frame(x1,x2)
+df1
+```
+
+10. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions, R Ordered and unordered factors) The resulting `df1` looks slightly different from `matrix1`. Explain in words why `df1` is the way that it is. What are the slight differences between `df1` and `matrix1`?
+
+Df1 is a data frame, which means that each column can contain data with different modes. The second column in Df2 was converted into a character vector, but data frames automatically coerce characters into factors. On the other hand, columns in matrices all have to be of the same mode.

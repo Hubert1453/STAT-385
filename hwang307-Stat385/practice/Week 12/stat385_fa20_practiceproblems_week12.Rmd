@@ -1,0 +1,69 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 12 Practice Problems
+### Created by Prof. Christopher Kinson
+
+**#1** (RMarkdown, R Objects, their modes, and attributes, R Lists and data frames, What is data, Importing data, Importing data with the tidyverse) Import the data set below using either base R or tidyverse functionality. 
+
+- [Vote By Mail Data](https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv). 
+
+```{r}
+library(tidyverse)
+vote <- read_csv("https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv", 
+    col_types = cols(`Ballot Req Date` = col_date(format = "%m/%d/%Y"), 
+        `Ballot Sent Date` = col_date(format = "%m/%d/%Y"), 
+        `Ballot Received Date` = col_date(format = "%m/%d/%Y")))
+```
+
+**#2** Using the imported Champaign County Vote By Mail Data, base R plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/qw1s77n16kohft9fmg9m8jq4guekuj8z.png)
+```{r}
+date <- seq.Date(sort(vote$`Ballot Req Date`,FALSE)[1],sort(vote$`Ballot Received Date`,TRUE)[1],"day")
+req <- NULL
+x <- 0
+date
+for (i in date){
+  req <- c(req,x+nrow(vote[which(vote$`Ballot Req Date`==i),])-nrow(vote[which(vote$`Ballot Received Date`==i),]))
+  x <- x+nrow(vote[which(vote$`Ballot Req Date`==i),])-nrow(vote[which(vote$`Ballot Received Date`==i),])
+}
+plot(date,req,main="Vote By Mail 2020\nNumber of Requested Ballots Yet to Be Received in Champaign County",xlab="Date",ylab="",type="n",frame.plot=FALSE,axes=FALSE,ylim=c(0,30000))
+lines(date,req,lwd=2)
+lines(rep(as.Date("11-2-2020","%m-%d-%Y"),length(date)),req,col=rgb(232/255,74/255,39/255),lty=2)
+lines(rep(as.Date("4-21-2020","%m-%d-%Y"),length(date)),req,lty=2)
+points(date[1],head(req,1),pch=16)
+points(date[length(date)],tail(req,1),pch=16)
+points(date[which(req==max(req))],max(req),pch=16)
+text(date[1],head(req,1),head(req,1),pos=3)
+text(date[length(date)],tail(req,1),tail(req,1),pos=2)
+text(date[which(req==max(req))],max(req),max(req),pos=3)
+axis(1,at=max(date),"Nov. 2, 2020",col.axis=rgb(232/255,74/255,39/255),tick=FALSE)
+axis(1,at=min(date),"Apr. 21, 2020",tick=FALSE)
+```
+
+**#3** Using the imported Champaign County Vote By Mail Data, tidyverse plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/qw1s77n16kohft9fmg9m8jq4guekuj8z.png)
+```{r}
+tib <- tibble(Date=date,Req=req)
+ggplot(data=tib) +
+  geom_line(mapping=aes(x=Date,y=Req)) +
+  labs(title="Vote By Mail 2020\nNumber of Requested Ballots Yet to Be Received in Champaign County",x="Date",y="") +
+  annotate("text",x=c(min(tib$Date)+5,max(tib$Date)-5),y=-1000,label=c("Apr. 21, 2020","Nov. 2, 2020"),colour=c("Black",rgb(232/255,74/255,39/255))) +
+  geom_point(mapping=aes(x=date[which(req==max(req))],y=max(Req)))+
+  geom_point(mapping=aes(x=head(Date,1),y=head(Req,1)))+
+  geom_point(mapping=aes(x=tail(Date,1),y=tail(Req,1)))+
+  geom_text(mapping=aes(x=date[which(req==max(req))],y=max(Req),label=max(Req)),nudge_y=750)+
+  geom_text(mapping=aes(x=head(Date,1),y=head(Req,1),label=head(Req,1)),nudge_x=3,nudge_y=750)+
+  geom_text(mapping=aes(x=tail(Date,1),y=tail(Req,1),label=tail(Req,1)),nudge_x=-7)+
+  theme(panel.background = element_rect(fill = "white"),axis.ticks=element_blank(),axis.text=element_blank())+
+  geom_vline(xintercept=lubridate::mdy("11/2/2020"),linetype=2,colour=rgb(232/255,74/255,39/255)) +
+  geom_vline(xintercept=lubridate::mdy("4/21/2020"),linetype=2)
+```

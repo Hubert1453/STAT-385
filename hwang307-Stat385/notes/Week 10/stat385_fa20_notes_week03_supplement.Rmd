@@ -1,0 +1,69 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## **Supplement to Week 3 Notes**
+### Created by Prof. Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Formatting data  
+
+  - Date and time  
+
+  - Character encoding  
+
+
+***
+
+
+## Formatting data
+Formatting data, especially fields, are a common task prior to data wrangling. It may be important to ensure the information you are accessing is represented and most easily understood. Two frequent aspects of formatting involve dates, times, and characters.
+
+### Date and time
+When a data set contains date and time information in the columns, the dates and times may be correctly imported internally by the programming language, but misinterpreted externally by the users. Most programming languages, operating systems, and software internally store dates and times as a numeric value in reference to some specific date. For example, in SAS, the reference date is January 1, 1960. In R and Python, internal dates and times are in reference to January 1, 1970. You may find it necessary to convert strings into date values or re-format existing date values so that they are in a format consistent with the work you are doing. 
+
+Below is a table of some standard date formats that work in R. For more information, see [R with the tiyverse](https://r4ds.had.co.nz/dates-and-times.html), and [R with base R](https://www.statmethods.net/input/dates.html). 
+
+Code | Meaning
+---|---
+\%a	| Abbreviated weekday name	
+\%A	| Full weekday name
+\%b	| Abbreviated month name	
+\%B	| Full month name
+\%c	| Date and time	
+\%d	| Day of the month (0-31)
+\%H	| Hours (24 hour)	
+\%I	| Hours (12 hour)
+\%j	| Day of the year numbered (000-366)
+\%m	| Month numbered (01-12)
+\%M	| Minute numbered (00-59)	
+\%p	| AM/PM
+\%S	| Second numbered (00-61)	
+\%U	| Week of the year starting on Sunday numbered (00-53)
+\%w	| Weekday starting on Sunday numbered (0-6)	
+\%W	| Week of the year starting on Monday numbered (00-53)
+\%y	| 2-digit year	
+\%Y	| 4-digit year
+\%z	| Offset from UTC	
+\%Z	| Time zone (character)
+
+For example, we can adjust the default way the programming language handles a column with dates such that it is treated and interpreted as a date column. There's a few ways to handle this **time and date coercion** in R. Here I show two ways: tidyverse's `lubridate` package and `as.Date()` in base R. Notice that the mode of a correctly formatted (and interpreted) date should be numeric, not character.
+```{r}
+testcolumn <- c("10-11-2012", "10-12-2012") #treated as a character
+str(testcolumn); mode(testcolumn)
+
+testcolumn2 <- as.Date(testcolumn, "%m-%d-%Y")
+str(testcolumn2); mode(testcolumn2)
+
+library(tidyverse)
+testcolumn3 <- lubridate::mdy(testcolumn)
+str(testcolumn3); mode(testcolumn3)
+
+format(as.Date(testcolumn, format = "%m-%d-%Y"), "%Y") #only show the 4 digit year
+```
+

@@ -1,0 +1,224 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Midterm Exam
+### Due: Friday October 23, 2020 11:59 pm US Central Time
+#### Created by Prof. Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+**Retrieving your work**
+
+This midterm file is written in RMarkdown (.Rmd). The .Rmd file will exist in the `exams` directory within the `course-materials` repo, i.e. `course-materials/exams` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of the midterm exam. After pulling the repo, the midterm file will be in the homework directory. You must save the midterm file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as midterm_netID.Rmd. For example, my midterm exam file would be saved as midterm_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as midterm_netID.html. For example, my midterm exam ile would be saved as midterm_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the provided URLs to access the datasets (if any). Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset()` function is never allowed in this course. Only use `set.seed()` when instructed. No tidyverse functionality is allowed on this exam.
+
+**#1** (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in bold text as the second item. 
+
+   1. Hubert
+   2. **Wang**
+
+**#2** (RMarkdown, R Simple manipulations and Numbers and vectors) Using RMarkdown and the vector `X` with the code `set.seed(385); X <- rnorm(9)` compute the following statistic for `X` by only using operators, vectors, sequences, or indexing (but no functions) and the formula as a guide:  
+- the median $\tilde{X}=X_{\{(N + 1) ÷ 2\}}$ where $X$ is ordered from $i=1,\dots,N$.
+
+```{r}
+set.seed(385)
+X <- rnorm(9)
+X
+X <- c(-0.79764060,-0.61346699,-0.60017263,-0.38303588,-0.03958418,0.44064853,0.77728575,0.88745254,1.13788102)
+X_mid <- (9+1)/2
+X[X_mid]
+```
+    
+**#3** (RMarkdown, R Simple manipulations and Numbers and vectors) Using RMarkdown and the vector `X` with the code `set.seed(385); X <- rnorm(10)` compute the following statistic for `X` using using operators, vectors, sequences, or indexing and any of the three functions `length()`, `sort()`, and `sum()` and the formula as a guide:  
+
+- the squared deviations from the maximum (the largest value of $X$) $(X_i-\hat{X})^2$ where the maximum is $\hat{X}=X_N$ where $X$ is ordered from $i=1,\dots,N$
+
+```{r}
+set.seed(385)
+X <- rnorm(10)
+X <- sort(X)
+max_X <- X[length(X)]
+X_dev <- (X-max_X)^2
+X_dev
+```
+  
+**#4** (RMarkdown, R Simple manipulations and Numbers and vectors) Using RMarkdown and only using operators, vectors, sequences, and indexing (no functions), determine if the number 1111 is prime or not. *The result must be only one single numeric value, not a vector of results.*
+
+```{r}
+#If x has a factor other than 1 and x, the sum function will return a value greater than 0 and the number is not prime.
+#If x has no other factors, the sum function will return a value of 0 and the number is prime.
+x <- 1111
+prime <- x%%(2:(x-1))
+sum(prime == 0)
+#1111 has 2 factors.
+#1111 is not a prime number.
+```
+
+**#5** (RMarkdown, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Writing your own functions) Using RMarkdown, create one custom user-defined function to determine if the number 1111 is prime or not. *This function must return one single character string only; either "1111 is prime" or "1111 is not prime". The number 1111 must be the input of your function. You cannot simply write the number 1111 as a character string itself when returning the result. Your function must be general enough to work for any number, not just 1111.*
+
+```{r}
+isprime <- function(numb){
+  ifelse(sum(numb%%(2:(numb-1))==0)==0,paste(numb,"is prime"),paste(numb,"is not prime"))
+}
+x <- 1111
+isprime(x)
+```
+
+**#6** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, answer the following question: How many cars have a quarter mile time that is faster than the average quarter mile time among all cars? *You must print out all data that satisfy the question being asked. The question should be answered in bold words in Markdown syntax, and the resulting code and data print out should serve as evidence.*
+
+**17 cars have a quarter mile time that is faster than the average quarter mile time**
+```{r}
+#qsec is the quarter mile time
+cars_fast <- mtcars[mtcars$qsec<mean(mtcars$qsec),]
+nrow(cars_fast)
+```
+
+**#7** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, answer the following question: How many automatic transmission cars have a quarter mile time that is faster than the average quarter mile time among all cars? *Your question should be answered in bold words in Markdown, and the resulting code and data print out should serve as evidence.*
+
+**10 auto transmission cars have a quarter mile time that is faster than the average quarter mile time for all cars**
+```{r}
+#automatic transmission is 0
+cars_auto <- mtcars[which(mtcars$am == 0 & mtcars$qsec<mean(mtcars$qsec)),]
+nrow(cars_auto)
+```
+
+**#8** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, answer the following question: How many cars are fuel efficient (over 19 mpg) and over 150 horsepower? *You must print out all data that satisfy the question being asked. The question should be answered in bold words in Markdown syntax, and the resulting code and data print out should serve as evidence.*
+
+**2 cars are fuel efficient and have over 150 horsepower**
+```{r}
+cars_eff <- mtcars[which(mtcars$mpg>19 & mtcars$hp>150),]
+nrow(cars_eff)
+```
+
+**#9** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, rename the data as `mtcars2` and mutate it by adding a new variable named `domestic` which contains values of "yes" if the car is a domestic manufacturer or "no" otherwise. The cars that have domestic manufacturers are any vehicles named: Duster, Hornet, Valiant, Cadillac, Lincoln, Chrysler, AMC, Camaro, Cheverolet, Pontiac, Ford, and Dodge. *Print the first 5 observations of the mtcars2 data as evidence.*
+
+```{r}
+dom_manufacture <- c("Duster","Hornet","Valiant","Cadillac","Lincoln","Chrysler","AMC","Camaro","Chevorlet","Pontiac","Ford","Dodge")
+x<-rep(0,nrow(mtcars))
+for (i in 1:length(dom_manufacture)){
+  x <- x + grepl(dom_manufacture[i],row.names(mtcars))
+}
+y <- sapply(x,FUN = function(i){
+  if (i == 1) "yes"
+  else "no"
+})
+mtcars2 <- mtcars
+mtcars2$domestic <- y
+head(mtcars2,5)
+```
+
+**#10** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with`mtcars2` data in **Problem #9**, answer the following question: How many domestic cars have a quarter mile time that is faster than the average quarter mile time among all cars? *You must print out all data that satisfy the question being asked. The question should be answered in bold words in Markdown syntax, and the resulting code and data print out should serve as evidence.*
+
+**9 domestic cars have a quarter mile time that is faster than the average quarter mile time for all cars**
+```{r}
+cars_domestic <- mtcars2[which(mtcars2$qsec<mean(mtcars2$qsec) & mtcars2$domestic == "yes"),]
+nrow(cars_domestic)
+```
+
+**#11** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, mutate the `transmission` column into a character vector such that the value 0 is replaced with "automatic" and the value 1 is replaced with "manual". Print the resulting data frame. *You cannot use the `ifelse()` function for this problem. You can only use looping and conditional execution. Tidyverse functionality is not allowed.*
+
+```{r}
+names(mtcars)[names(mtcars) == "am"] <- "transmission"
+x <- sapply(mtcars$transmission,FUN = function(i){
+  if (i == 1) "manual"
+  else if (i==0) "automatic"
+})
+mtcars$transmission <- x
+mtcars
+```
+
+**#12** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, mutate the `transmission` column into a character vector such that the value 0 is replaced with "automatic" and the value 1 is replaced with "manual". Print the resulting data frame. *You cannot use any looping for this problem. You can only use vectorization or vectorized functions. Tidyverse functionality is not allowed.*
+
+```{r}
+data(mtcars)
+names(mtcars)[names(mtcars) == "am"] <- "transmission"
+x <- ifelse (mtcars$transmission == 1,"manual","automatic")
+mtcars$transmission <- x
+mtcars
+```
+
+**#13** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames) Beginning with R's internal `mtcars` data, coerce the data frame into a list. Print the resulting list.
+
+```{r}
+data(mtcars)
+mtcars <- as.list(mtcars)
+mtcars
+```
+
+**#14** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Lists and data frames) R's internal `mtcars` data frame looks different from the list version of `mtcars`. What are the differences between the two? Write your answer in complete sentences and in **bold** Markdown syntax.
+
+**Lists are recursive data objects and are made up of components, each of which can have different length or mode. A data frame is a type of list. Data frames are different as each component of a data frame has to be a vector of values, and all vectors must have the same length. This means that the data frame forms a rectangular data object and that it has rows and columns.**
+
+**#15** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Lists and data frames) R's internal `mtcars` data frame looks different from the list version of `mtcars`. A list is a data frame. True or false? Write your answer in **bold** Markdown syntax.
+
+**False**
+
+**#16** (RMarkdown, Data wrangling) Which of the following actions of data wrangling commonly allows for group processing? Write the letter of your answer in **bold** Markdown syntax. *Only one answer is needed.*
+
+a. arranging
+
+b. selecting
+
+c. summarizing
+
+d. none of the above
+
+**c**
+
+**#17** (RMarkdown, Data wrangling) Arranging data includes sorting the data. True or false? Write your answer in **bold** Markdown syntax.
+
+**True**
+
+**#18** (RMarkdown, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization) Which of the following runs looping structures in the background but not in the foreground? Write the letter or letters of your answer in **bold** Markdown syntax. *There is more than one answer.*
+
+a. `for` loops
+
+b. `apply()`
+
+c. `ifelse()`
+
+d. none of the above.
+
+**b and c**
+
+**#19** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Taking a closer look at R's internal `mtcars` data, does it have row names? If so, print the row names. If `mtcars` does not have row names, don't print them. *To check if a data frame has row names use the row.names() function.*
+
+```{r}
+data(mtcars)
+row.names(mtcars)
+```
+
+**#20** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with R's internal `mtcars` data, use string manipulation to create a character vector named `car_name` which contains the very first word of each car's name. *There should be 32 names in the resulting `car_name` vector. To check if a data frame has row names use the row.names() function. Tidyverse functionality is not allowed.*
+
+```{r}
+#adding two spaces to the end of every string, then removing the characters between any spaces in the string
+car_name <- paste(row.names(mtcars),"  ", sep = "")
+car_name <- gsub("\\s.*\\s","",car_name)
+car_name
+length(car_name)
+```

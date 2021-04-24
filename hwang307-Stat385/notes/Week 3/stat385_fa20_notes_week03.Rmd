@@ -1,0 +1,111 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 3 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- **An Introduction to R** *Chapter 3 Objects, their modes and attributes*
+
+- Object Arrangement
+
+- **An Introduction to R** *Chapter 4 Ordered and unordered factors*
+
+
+***
+
+
+### ICYMI: [**An Introduction to R**](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) by Venables, Smith and the R Core Team is one of the reference textbooks in the syllabus.
+
+
+***
+
+
+## **An Introduction to R** *Chapter 3 Objects, their modes and attributes*
+
+**Atomic** objects contain values all of the same type - character, logical, numeric. Vectors, matrices, and arrays are atomic structures. **Recursive** objects contain values of different types. Lists, functions, and expressions are recursive objects. Every defined object has a mode and a length.
+
+```{r note1}
+mode(letters)
+length(letters)
+```
+
+We can also check the **structure** of an object which includes the mode or type and the first few elements of each of the object's dimensions.
+```{r}
+str(letters)
+```
+
+
+Some common modes include numeric, logical, character, list, matrix, array, factor, and data.frame. There are other ways to check the mode of an object that would return a logical value of `TRUE` or `FALSE`. 
+```{r}
+is.atomic(letters)
+is.numeric(letters)
+is.logical(letters)
+is.character(letters)
+is.list(letters)
+is.matrix(letters)
+is.array(letters)
+is.factor(letters)
+is.data.frame(letters)
+```
+
+An object's **mode** can be changed via coercion. Coercion is the act of changing the mode of an object. R allows for this to occur for many modes and objects even when it doesn't make sense. Coercion can happen by using the `as.newmode(object)`. See below for examples.
+
+```{r note2}
+x <- 1:20
+x <- x[1:19]
+xx <- as.character(x)
+xx
+as.numeric(xx)
+```
+
+An object's **length** can be changed via reassignment.
+```{r}
+length(xx) <- 10
+```
+
+## Object Arrangement
+
+Objects can be sorted or arranged in an order that we have control over. Objects can be arranged with the `sort()` function or the `order()` function. The `sort()` function arranges the object displaying the raw values of the object in its new order. Whereas the `order()` function arranges the object displaying the corresponding indices; not the raw values. We can combine these functions with the concept of indexing (week 2).
+```{r}
+iris_SL <- iris$Sepal.Length[1:20]
+sort(iris_SL)
+sort(iris_SL, decreasing = TRUE) #decreasing order
+order(iris_SL)
+iris_SL[order(iris_SL)]
+iris_SL[order(iris_SL, decreasing = TRUE)] #decreasing order
+```
+
+
+## **An Introduction to R** *Chapter 4 Ordered and unordered factors*
+
+Factors are vectors specially designed for categorical data. Their levels are the categories within. Inside a factor, its levels may be ordered or unordered. When we want to see the levels, they are usually in alphanumeric order.
+
+```{r note3}
+data(iris)
+iris$Species
+is.factor(iris$Species)
+levels(iris$Species)
+factor(round(iris$Sepal.Length,0))
+```
+
+Some times, factors are not preferred. In previous versions of R (before 4.0.0), data frames automatically coerced any column with characters or strings as factor type. We can imagine that this default behavior would not always be welcome. And the `tidyverse` collection of packages made sure to change this default behavior. We'll discuss more about the tidyverse functionality later in the semester. *If you don't have it installed already, do install the `tidyverse` package; otherwise the chunk won't run properly.*
+
+```{r}
+#if your version of R is outdated, then you will see differences in the following results when you execute this chunk
+str(read.csv("https://uofi.box.com/shared/static/ko6uqp336nruywnormrp6euo9qrraigs.csv"))
+library(tidyverse)
+str(read_csv("https://uofi.box.com/shared/static/ko6uqp336nruywnormrp6euo9qrraigs.csv"))
+```
+

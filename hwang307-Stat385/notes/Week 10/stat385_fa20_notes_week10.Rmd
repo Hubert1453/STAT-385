@@ -1,0 +1,317 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 10 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Introduction to the tidyverse
+
+- Importing data with the tidyverse
+
+- Data wrangling with the tidyverse
+
+
+***
+
+
+## Introduction to the tidyverse
+The tidyverse is a collection of R packages developed with data science in mind. The developers often collaborate and have support through the RStudio company. The `tidyverse` itself is a package in R that will call upon each package within the collection including: `readr`, `stringr`, `dplyr`, `tidyr`, `tibble`, `purr`, and `forcats`. These packages and their functionality work extremely well for tibbles, but they also may be executed on data frames, lists, vectors, and matrices when appropriate (depends on the package and the function).
+
+You'll want to install the `tidyverse` package to simplify the usage of any of these at will, e.g., `install.packages("tidyverse")`. Otherwise, you can install each package on its own, e.g., `install.packages("readr")`. To use any package alone, simply call it, e.g., `library(readr)`. To learn more about any of these packages and their usage, you should read their documentation at https://www.tidyverse.org/packages/.
+
+##Again as I have said repeatedly, make sure your version of R is up-to-date (newest R version is 4.0.3)!
+
+
+***
+
+
+## Importing data in the tidyverse
+The bulk of what you will handle in life as statisticians will be external datasets. There are several ways to access and import external data but we'll focus on two: read_table and read_csv using the tidyverse package. The advantages of readr's importing (e.g. read_csv) over R's base importing (e.g. read.csv) are: much faster importing, much larger datasets for importing, and more simplified imported data in the form of tibbles.
+
+### using `read_delim()`
+This is one function for accessing data in general, especially data with tabs or spaces as delimiters or separators. We usually need to supply the file location and the separator. Let's read in a local data file. First, download the [brain.txt](https://uofi.box.com/shared/static/cyczwbfxpllw7f5jt5qoip6mt1578cke.txt) to your local computer.
+
+```
+##run this but change the file location
+library(tidyverse)
+read_delim("C:/Users/CKinson/Downloads/brain.txt", delim="\t") #works without having to first run library(readr)
+
+readr::read_delim("C:/Users/CKinson/Downloads/brain.txt", delim="\t") #works without having to first run library(tidyverse)
+```
+
+### using `read_csv()`
+This is one function for accessing data with commas as delimiters or separators. It has the same functionality as `read_delim` but assumes the default delimiter is comma. Typically, we only need to supply the file location. Let's read in a local data file. First, download the [brain.csv](https://uofi.box.com/shared/static/4v7q5rzxsrceeuzioya99zn2z85mcfno.csv) to your local computer.
+
+```
+##run this but change the file location
+readr::read_csv("C:/Users/CKinson/Downloads/brain.csv" ,header=TRUE)
+```
+
+We can also use the URLs as the file locations in the tidyverse.
+
+```{r}
+library(tidyverse) #just in case
+##run this but change the file location
+readr::read_csv("https://uofi.box.com/shared/static/4v7q5rzxsrceeuzioya99zn2z85mcfno.csv")
+```
+
+One final aspect of importing data with `readr` is the idea of importing the data through RStudio's "Import Dataset" wizard (menus, not purely from code). Importing in this way allows us to control how each column should be formatted, how specific we need the parameters of importing to be, and the source of the data. In other words, we can use the wizard to do any specific coercion or formatting at the time of importing (handling dates and times, coercing character columns to numeric, etc.)
+
+Here's a procedure for using RStudio's "Import Dataset" wizard:
+
+- Go to File > Import Dataset > From Text (readr).
+
+![](https://uofi.box.com/shared/static/ct3fyv9zz2vngozxauyy22tezqurxdyc.png)
+
+- Paste the data file location in the File/URL box.
+
+![](https://uofi.box.com/shared/static/keeflyqia6r60ougu1jsfjj3jp22a3wg.png)
+
+- Look at your Data Preview and click on any columns that need re-formatting.
+
+- Once satisfied with the Data Preview, copy the code in the Code Editor box and paste it into your code chunk.
+
+***
+
+## Data wrangling with the tidyverse
+Data wrangling is the set of procedures and tasks for cleaning and managing data so that the data can be analyzed easily. It is a crucial and time-consuming aspect of data analysis work. In this course, we are going to opt for a mixture of standard R functionality (Week 8) as well as **tidyverse** functionality (Week 10) to wrangle data in a neat and useful manner. This week, we focus entirely on the tidyverse.
+
+*To access a function's help page for a package that isn't currently called, use the `?` operator before the name of the package then `::` then the name of the function. For example,*
+```{r}
+?readr::read_csv
+?dplyr::arrange
+```
+
+We're going to explore 5 common actions for data wrangling. Let's show some examples with the **SBA Loans Data**.
+
+Here's how we can import an old version of the SBA Loans Data. Using `read_csv()` will take seconds to import a large dataset.
+```{r importing}
+library(tidyverse)
+Sys.time()
+sba <- read_csv("https://uofi.box.com/shared/static/vi37omgitiaa2yyplrom779qvwk1g14x.csv")
+Sys.time()
+```
+
+Next, we create a subset of the data which is much smaller than the original, print the first few rows of the subset, and remove the original larger data set.
+```{r cleaning}
+set.seed(448)
+SBA <- sba[sample(1:dim(sba)[1],200),] #randomized subset of 200 rows
+head(SBA, 10) #first 10 rows
+rm(sba) #remove the original large data file
+```
+
+When we check the mode of some of the columns in the SBA data, we notice that several columns represent dollar amounts yet have been automatically imported as character type. We have already learned about coercion and the pitfalls of coercion with data.frames. There is one big issue with attempting to coerce the dollar amounts in these columns: the literal dollar sign in each row preceding the number. Thus we'll briefly mention character manipulation.
+
+
+### String manipulation (preview of regular expressions)
+Strings are characters or sequences of characters. We can work with strings to wrangle them into something we need. The more detailed discussion of this is regular expression and `stringr` package in the tidyverse. For now, we will focus on the specific SBA data application.
+
+We need to remove the dollar signs and commas in order to properly coerce the columns representing dollar amounts to be numeric. *We didn't have to worry about white space, because read_csv removed it by default.* Since we need to **remove** characters from the string, we can use `stringr`'s `str_remove_all()` function in the tidyverse. We'll use the double escape character `\\` before the special characters as our pattern to match as in `"\\$|\\,"`. 
+```{r}
+test1 <- str_remove_all(SBA$DisbursementGross[1:10], "\\,|\\$") #just trying it out for the first 10 values
+test1
+as.numeric(test1) #checking coercion
+```
+
+Success!
+
+## The following actions are typically found in the `dplyr` package in the tidyverse.
+
+### Filtering
+We can subset observations based on their values using the `filter()` function. This type of subsetting allows us to only show observations that satisfy a particular condition. **The `subset()` function is never allowed in this course.**
+
+**Be careful not to confuse these actions in the tidyverse as permanent assignment operations. These actions show us temporary results that are not stored into any object; unless we assign them using the operator `<-`.**
+```{r filtering}
+filter(SBA, State == "CA")
+
+filter(SBA, State == "CA", City == "LOS ANGELES") 
+
+filter(SBA, State == "CA" | City == "LOS ANGELES") 
+
+filter(SBA, State == "CA" | State == "GA") 
+
+filter(SBA, State == "CA", State == "GA") 
+```
+
+### Arranging
+This action sorts the data by a particular set of columns using the `arange()` function. We can sort items in ascending (default) or descending order for a particular column. And we can do this for more than one column at once.
+```{r arranging}
+arrange(SBA, State, desc(DisbursementGross)) 
+
+arrange(SBA, State, desc(DisbursementGross)) 
+
+SBA2 <- arrange(SBA, State, desc(DisbursementGross)) 
+head(SBA2)
+```
+
+
+### Selecting
+This action describes keeping or dropping variables or columns from a dataset using the `select()` function. We might **rename** variables or columns via the `rename()` function. Also, we might change the column order by moving a few columns only and keeping the remaining columns intact (see the `everything()` function). **Second reminder: these are not permanent assignment operations.**
+```{r selecting}
+select(SBA, State, NoEmp, DisbursementGross) #keeping columns
+
+select(SBA, -c(State, NoEmp, DisbursementGross)) #dropping columns
+
+select( rename(SBA, TotalEmployees = NoEmp), TotalEmployees, State) #renaming columns
+
+select(SBA, DisbursementGross, NoEmp, everything()) #moving some columns to the first few columns instead of their current column order
+```
+
+
+### Mutating
+Mutating a data set is the act of creating new variables or overwriting old ones. Mutating is accomplished through the `mutate()` function.
+```{r mutating}
+mutate(SBA, LogDG = log(as.numeric(str_remove_all(DisbursementGross, "\\,|\\$"))), Portion = as.numeric(str_remove_all(SBA_Appv, "\\,|\\$"))/as.numeric(str_remove_all(GrAppv, "\\,|\\$")))
+```
+
+Functions that are already understood in R as **vectorized** functions can be used within the `mutate()` function such as
+```{r mutating2}
+select( mutate(SBA, Ontology = ifelse(NewExist==2,"new biz", "existing biz")), Ontology, NewExist, NoEmp)
+```
+
+
+### Summarizing
+We can create grouped summaries of data by calculating a summary value (frequency, mean, median, etc.) for all members within a group. Ideally, we want the result to be a data frame or other recursive object when possible. With the tidyverse, we need two actions to work in tandem: `group_by()` and `summarise()`. 
+
+The `group_by()` function allows us to do data processing separately for each group in the data frame. By itself, the function does not affect the data outwardly. The group processing takes place once we combine this function with other dplyr function (verbs), especially `summarise()`. The `group_by()` can work with `mutate()` and `arrange()` as well when specified.
+
+We can create grouped summaries of data with the `summarise` function. By itself it collapses a data frame into a vector by aggregating. **This implies that we first group the data, then summarise.** Also notice the difference between `mutate()` and `summarise()` after the `group_by()`.
+```{r summarising}
+g <- group_by(SBA, State)
+
+x1<-summarise(g, AvgDG = mean(as.numeric(str_remove_all(DisbursementGross, "\\,|\\$"))))
+x1
+
+x2<-mutate(g, AvgDG = mean(as.numeric(str_remove_all(DisbursementGross, "\\,|\\$"))))
+x2
+
+dim(x1);dim(x2)
+```
+
+
+### Combining
+What happens when you need to work with multiple datasets at once? What happens when the one dataset you have is not enough information? Where do you get the additional information? Combining data sets is a very useful data wrangling operation. Grabbing information from another dataset and adding it to your current one potentially increases your information. Combining data could mean different things in various disciplines or the same thing with different terms such as concatenating, merging, binding, appending, or joining.
+
+Concatenating is the act of combining objects or strings together and is typically done with `glue()` in the tidyverse. In order to use the glue function, we may have to install the glue package separately and call it separately as in `glue::glue()`.
+
+In the tidyverse (dplyr), binding (or appending) is the act of combining two or more objects by stacking one on top of the other such as `bind_rows()` or stacking one next to the other such as `bind_cols()`.
+
+Merging (or joining) usually implies combining two or more objects with different columns of information into one single object. This merging would require each of the different data objects to have one column in common with a unique identifying information such as an ID variable or geographic location. There are at least 3 situations that can occur when merging objects. 
+
+1. Observations in the two (or more) separate objects could not match each other.
+
+**Data 1**  
+
+ID | Salary
+---|---
+A | $10K
+B | $11K
+D | $12K
+
+**Data 2**  
+
+ID | Number
+---|---
+C | 2175551234
+E | 2175551235
+F | 2175551236
+
+**Merged Data**  
+
+ID | Salary | Number
+---|---|---
+A | $10K |
+B | $11K |
+D | $12K |
+C |  | 2175551234
+E |  | 2175551235
+F |  | 2175551236
+
+2. Observations in the two (or more) separate objects could match each other one-to-one.
+
+**Data 1**  
+
+ID | Salary
+---|---
+A | $10K
+B | $11K
+D | $12K
+
+**Data 2**  
+
+ID | Number
+---|---
+A | 2175551214
+B | 2175551224
+D | 2175551244
+
+**Merged Data**  
+
+ID | Salary | Number
+---|---|---
+A | $10K | 2175551214
+B | $11K | 2175551224
+D | $12K | 2175551244
+
+3. Observations in the two (or more) separate objects could match each other one-to-many (or many-to-one).
+
+**Data 1**  
+
+ID | Salary
+---|---
+A | $10K
+D | $12K
+
+**Data 2** 
+
+ID | Number
+---|---
+A | 2175551214
+A | 2175551204
+D | 2175551244
+
+**Merged Data**  
+
+ID | Salary | Number
+---|---|---
+A | $10K | 2175551214
+A | $10K | 2175551204
+D | $12K | 2175551244
+
+How we merge (or join) the data depends on which of the three situations is intended for the data management. Only keeping the matches (#2 and #3 above) could be accomplished using an inner join (`inner_join()` in R's tidyverse-dplyr). Keeping the matches (#2 and #3 above) and non-matches (#1 above) could be accomplished using a full join (`full_join()` in R's tidyverse-dplyr). Whenever the common column of the different data objects contain the same information but have different column names, the easiest fix is to rename the column in one of the two objects (`rename()` in R's tidyverse-dplyr).
+
+The code example below highlights the different meanings for combining data in R coding.
+
+```{r combining}
+irisdat1 <- iris[1:100, c(1,4,5)]
+irisdat2 <- iris[1:100, c(2,3,5)]
+irisdat3 <- iris[101:150, c(2,3,5)]
+
+head(irisdat1)
+head(irisdat2)
+head(irisdat3)
+
+glue::glue("The iris we love most is the {iris$Species} species.")[1:10]
+
+head(bind_cols(irisdat1, irisdat2[,-3]))
+
+head(bind_rows(irisdat2, irisdat3))
+
+head(inner_join(irisdat1, irisdat2, "Species"))
+
+head(inner_join(mutate(irisdat1, NewSpecies = paste0(Species, 1:100)), mutate(irisdat2, NewSpecies = paste0(Species, 1:100)), "NewSpecies"))
+```
+
+**There are a host of other functions and operations to be discovered in tidyverse's dplyr. Please check out the RStudio cheatsheets for dplyr https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf.**

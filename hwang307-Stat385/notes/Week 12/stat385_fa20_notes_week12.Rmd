@@ -1,0 +1,1051 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Week 12 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Data visualization in R (base R)
+  
+- Data visualization in R (ggplot2 in the tidyverse)
+  
+- Visual design principles
+
+
+***
+
+
+Plots, graphs, and visual charts are the most crucial tools we have as data analysts, statisticians, and data scientists. In the notes that follow, I will highlight base R plotting and ggplot2 (the tidyverse) plotting capabilities. Consider these notes as a reference for what's possible in R for data visualization.
+
+
+***
+
+
+## Data visualization in R (base R)
+
+The `plot` function in R is quite powerful and flexible. We explain by example but first, let's import a version of the jail Jail Data by importing with the tidyverse's `read_csv()`.
+
+```{r}
+library(tidyverse)
+jail <- read_csv("https://uofi.box.com/shared/static/9elozjsg99bgcb7gb546wlfr3r2gc9b7.csv")
+jail$`days in jail` <- as.numeric(jail$`Days in Jail`)
+jail$`hours in jail` <- as.numeric(jail$Hours)
+jail$`minutes in jail` <- as.numeric(jail$Minutes)
+jail$`seconds in jail` <- as.numeric(jail$Seconds)
+jail <- jail[sample(nrow(jail),200),-c(31:35)]
+colnames(jail) <- tolower(colnames(jail))
+jail$race2 <- ifelse(jail$race=="Black","Black","Not Black")
+```
+
+Typically we plot two numeric vectors.
+```{r}
+x<- jail$`age at arrest`
+y<- jail$`age at release`
+plot(x,y)
+```
+
+The two numeric vectors could be in a single matrix.
+```{r}
+mat<- matrix(c(jail$`age at arrest`,jail$`age at release`), ncol=2)
+plot(mat)
+```
+
+We could create a time series plot (aka "index plot" aka "series plot") using a single numeric vector.
+```{r}
+plot(jail$`days in jail`)
+```
+
+We could take advantage of factors in the data to plot a bar plot or box plots per level of the factor.
+```{r}
+jr<-factor(jail$race)
+plot(jr)
+
+plot(jr, jail$`days in jail`)
+```
+
+Or we could use the `table` function to explicitly count the frequency for the levels or categories to show a bar plot with `barplot()`.
+```{r}
+ccs <- names(sort(table(jail$`crime code`), decreasing=TRUE)[1:5])
+jcc <- jail[which(jail$`crime code`==ccs),]
+t1 <- table(jcc$`crime code`, jcc$race)
+
+barplot(colSums(t1))
+barplot(rowSums(t1))
+barplot(t1)
+barplot(t1, beside = TRUE)
+```
+
+We can create univariate visualizations such as a histogram.
+```{r}
+x <- rnorm(1000)
+hist(x)
+```
+
+Q-Q plot (AKA quantile-quantile plot AKA normal scores plot).
+```{r}
+qqnorm(x)
+qqline(x) #adds a reference line based on theoretical values
+```
+
+For data frames, we can leverage that structure to produce multiple plots with one `plot()` function.
+```{r}
+plot(`days in jail` ~ `age at arrest` + `age at release`, data=jail)
+
+jdf<-data.frame(jail$`age at arrest`, jail$`age at release`, jail$race)
+plot(jdf)
+```
+
+One popular multivariate plot is with the `pairs()` function.
+```{r}
+pairs(jdf[,-3])
+```
+
+But if we wanted to see the pairwise relationship between age at arrest and days in jail for each racial category (assuming we only had black and white categories), we could use a `coplot()`.
+```{r}
+jdff <- data.frame(ageatarrest=jail$`age at arrest`, daysspent=jail$`days in jail`, race=jail$race)
+jdff<-jdff[which(jdff$race=="Black" | jdff$race=="White"),]
+jdff$race<-factor(jdff$race)
+coplot(daysspent ~ ageatarrest | race, data=jdff)
+```
+
+We can visualize other multivariate relationships as a mosaic plot with `mosaicplot()`.
+```{r}
+v1<-sample(LETTERS[1:3],30,replace=TRUE)
+v2<-sample(letters[1:3],30,replace=TRUE)
+mosaicplot(table(v1,v2))
+```
+
+
+Above, we saw various types of plots: scatter, bar plot, series plots, coplots, and pairwise plots. Now let's specific changes and options we have to get more detailed plotting.
+
+
+### Adding Plotting Arguments
+
+There are various arguments that can be added to plots to add visual clarity and to remove things that are distracting. Here's a short list.
+
+- type: changes the plotting type
+- xlab: labels the x axis
+- ylab: labels the y axis
+- main: labels the main title of the plot (appears at the top of the plotting space)
+- sub: labels the subtitle of the plot (appears at the bottom of the plotting space)
+- pch: changes the plotting character for the point type
+- pwd: changes the plotting character width for the point type
+- lty: changes the plotting character for the line type
+- lwd: changes the plotting character width for the line type
+- xlim: adjusts the lower and upper boundaries of the x axis
+- ylim: adjusts the lower and upper boundaries of the y axis
+- col: changes the colors of the plotting character
+
+Now let's go back and add basic arguments that may help improve our interpretation of the plots.
+```{r}
+plot(mat, xlab="Age at Arrest", ylab="Age at Release", main="A Basic Scatter Plot", pch="+")
+
+plot(jail$`days in jail`, xlab="Index", ylab="Days in Jail", main="A Series Plot", type="l", lty=2, lwd=2)
+
+plot(jr, jail$`days in jail`, main="Distributions of Days Spent in Jail Per Racial Group")
+```
+
+### Color options
+
+We have a few ways to specify colors of plotting characters and elements. We can specify the colors using a color in quotes, such as "red", based on the possible colors list using the function `colors()`.
+```{r}
+head(colors())
+x <- sort(rnorm(30)+2)
+y <- sort(rnorm(30))
+plot(x, y, col="red")
+```
+We can use a number for the colors which is a specific short set of colors (1 to 8). These colors come from the `palette()` function.
+```{r}
+palette()
+x <- sort(rnorm(24)+2)
+y <- sort(rnorm(24))
+plot(x, y, col=1:8)
+```
+
+We can specify a particular color based on its RGB (red green blue) value with the `rgb()` function taking values between 0 to 255. Alternatively, we can use hexadecimal digits of the RGB values of the form `"#RRGGBB"` ranging from 00 to FF.
+```{r}
+x <- sort(rnorm(24)+2)
+y <- sort(rnorm(24))
+plot(x, y, col=rgb(232/255,74/255,39/255)) #Illinois orange
+plot(x, y, col="#13294B") #Illinois blue
+```
+
+
+### Jittering points 
+
+Sometimes we may have data that is overplotted, i.e. points are on top of each other. We can add a small error (AKA noise AKA perturbation) that would shift the locations of the points so that more of them can be seen.
+```{r}
+x <- sort(rnorm(30)+2)
+y <- sort(rnorm(30))
+z <- round(runif(30,0,1))
+plot(x,z)
+plot(x,jitter(z))
+```
+
+
+### Adding reference lines in plots
+
+Adding **reference lines** is a useful thing to do because it steadies the viewer's focus. We can add lines to various types of plots with the `lines` function
+```{r}
+x <- sort(rnorm(30)+2)
+y <- sort(rnorm(30))
+lm1 <- lm(y ~ x)
+
+plot(x,y)
+lines(x,lm1$fitted.values, col=4, lwd=2, lty=2) #a regression line
+lines(x,rep(mean(y),length(y)), col=2, lwd=2) # a horizontal line at the mean of y
+lines(rep(mean(x),length(x)),y, col=3, lwd=2) # a vertical line at the mean of x
+```
+
+
+### Suppressing plot elements in order to add elements
+
+Sometimes we may want to **suppress** the plotting characters (using the `type="n"` argument inside the plot function) or suppress the axes (using the argument `axes=FALSE` inside the plot function), or suppress framing of the plot (using the `argument frame.plot=FALSE` inside the plot function). 
+
+```{r}
+mat <- matrix(runif(30*5), ncol=5 )
+plot(x, y, type="n")
+
+plot(x, y, type="n", axes=FALSE)
+
+plot(x, y, type="n", axes=FALSE, frame.plot=FALSE)
+```
+
+After suppressing those items, we can **add** a more precise set of characters, such as a loop of points with the `points()` function
+```{r}
+mat <- matrix(runif(30*5), ncol=5 )
+plot(x, y, type="n")
+for(i in 1:ncol(mat))
+  points(x,mat[,i], pch=i)
+```
+
+or a loop of lines with the `lines()` function
+```{r}
+mat <- matrix(runif(30*5), ncol=5 )
+plot(x, y, type="n")
+for(i in 1:ncol(mat))
+  lines(x,mat[,i], lty=i)
+```
+
+or a set of text with the `text()` function
+```{r}
+plot(x[1:26], y[1:26], type="n")
+text(x[1:26], y[1:26], labels=paste(which(x==x),which(y==y)))
+text(x[1:26]-0.33, y[1:26], labels=LETTERS, col= 2)
+```
+
+
+### Adding axes, labels, and legends to plots
+
+Suppose now we have a bar plot.
+```{r}
+# a bar plot
+jail$race2 <- ifelse(jail$race=="Black","Black","Not Black")
+plot(factor(jail$race2))
+```
+
+Adding a **title** and **subtitle** with `title()` function
+```{r}
+plot(factor(jail$race2), )
+title("Champaign County Jail Bookings", "Years 2011-2016") #second argument is a subtitle
+```
+
+Adding a custom legend with the `legend()` function.
+```{r}
+levs <- levels(factor(jail$race2))
+plot(factor(jail$race2), col=1:length(levs))
+title("Champaign County Jail Bookings", "Years 2011-2016") #second argument is a subtitle
+legend("topright", legend=levs, fill=1:length(levs))
+```
+
+Suppressing the axis in order to add a custom axis with the `axis` function. We may need multiple axis functions for labeling each particular axis
+```{r}
+pl <- plot(factor(jail$race2), axes=FALSE)
+pl
+title("Champaign County Jail Bookings", "Years 2011-2016") #second argument is a subtitle
+axis(side=1, at=pl, labels=c("Black", "Not Black"))
+axis(side=2, xpd=TRUE)
+```
+
+
+### Adding transparency to points
+
+Rarely, you may want to add transparency to your color-filled characters to show how some values may intersect. (Or you could jitter them - see above). We can also choose custom colors based on their RGB (red, green, blue) value out of 250 using the `rgb()` function.
+```{r}
+x <- sort(rnorm(30)+2)
+y <- sort(rnorm(30))
+z <- round(runif(30,0,1))
+plot(x,z, col=rgb(0,204/255,0,alpha=1), pch=16, main="Plot A")
+plot(x,jitter(z), col=rgb(0,204/255,0,alpha=1), pch=16, main="Plot B")
+plot(x,z, col=rgb(0,204/255,0,alpha=0.333), pch=16, main="Plot C")
+```
+
+
+### Showing multiple plots in a single graphics device
+
+The par function gives us control over graphical parameters in R. Often we may use it to show multiple plots in a single graphics device by adjusting the matrix for that graphics device. Graphics devices are defaulted to be a 1 by 1 matrix.
+```{r}
+x <- sort(rnorm(30)+2)
+y <- sort(rnorm(30))
+plot(x,y, main="Plot A")
+plot(x,y, main="Plot B")
+lines(x,lm(y~x)$fit, col="blue")
+
+x11() #forces a new device to be created
+par(mfrow=c(1,2)) 
+plot(x,y, main="Plot A")
+plot(x,y, main="Plot B")
+lines(x,lm(y~x)$fit, col="blue")
+
+x11()
+par(mfrow=c(2,1)) 
+plot(x,y, main="Plot A")
+plot(x,y, main="Plot B")
+lines(x,lm(y~x)$fit, col="blue")
+
+x11()
+par(mfcol=c(1,2)) 
+plot(x,y, main="Plot A")
+plot(x,y, main="Plot B")
+lines(x,lm(y~x)$fit, col="blue")
+
+x11()
+par(mfcol=c(2,1)) 
+plot(x,y, main="Plot A")
+plot(x,y, main="Plot B")
+lines(x,lm(y~x)$fit, col="blue")
+
+#Don't forget to change the graphics parameter back to the 1 by 1 matrix
+par(mfrow=c(1,1))
+```
+
+### Saving multiple plots as image files
+
+```{r eval=FALSE}
+rm(i)
+pdf(file="plots.pdf")
+mat <- matrix(runif(30*5), ncol=5 )
+for(i in 2:ncol(mat))
+  plot(mat[,1],mat[,i], type="p", pch=19, col=4) #we should probably add titles and labels
+dev.off()
+```
+
+
+***
+
+
+## Data visualization in R (ggplot2 in tidyverse)
+The tidyverse with its **ggplot2** package has changed the way R users create visualizations. It is closely tied to tidy data and has a unified coding to create almost any plot you want. It does this through layering various elements of the plot. Please read more in **R for Data Science** *Ch. 3 Data Visualization*. The way the creators of ggplot want user to experience data visualization is through layering. We begin with a blank canvas to which we will add layers of different geometric objects.
+
+### An empty ggplot (canvas)
+
+We can create an empty plot that is the coordinate system. Adding layers is how we see the type of plot and the data. We'll use the jail subset from above
+```{r blankcanvasing}
+ggplot(data = jail)
+```
+
+### Aesthetic mappings
+
+Next, we want to add a layer that gives us a type of plotting type called a **geom function**. Every geom function has a mapping argument which requires a visual property or **aesthetic** `aes()`. Aesthetics can be shapes `shape=`, colors `color=`, and sizes `size=` of the plotting characters. Usually, We will map an aesthetic to a variable already present in the data. Notice the legend is created automatically.
+```{r aesmapping}
+ggplot(data = jail) +
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`, color = factor(sex)))
+```
+
+Other aesthetics include transparency `alpha=`. What about `x` and `y`? Notice the `+` signs?
+
+We could also set an aesthetic to the geom function without mapping, such as
+```{r aesnomapping}
+ggplot(data = jail) +
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`), color = "blue")
+```
+
+### Facets
+
+Adding facets can be helpful for displaying various categories, levels, or discrete values for the data you're visualizing. It creates subsets of the data with headers in the plot to remind users of what's being shown.
+
+With one categorical variable, use `facet_wrap`, with two variables use `facet_grid`.
+```{r facetwrapping}
+ggplot(data = jail) +
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`), color = "blue") +
+  facet_wrap( ~ factor(sex))
+```
+
+
+```{r facetgridding}
+ggplot(data = jail) +
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`), color = "blue") +
+  facet_grid( factor(race2) ~ factor(sex))
+```
+
+
+### Geometric objects
+
+There are several kinds of geometric objects we can show. These geometric objects include points for scatter plots, bars for bar charts, lines for line plots, and more. We already saw the `geom_points` layer above.
+
+- `geom_bar` for bar charts works when we the frequencies are coming directly from the data and not from a contingency table or summary table
+```{r geombarring}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex)))
+```
+
+- `geom_col` for bar charts works well when the data is in a contingency table or summary table
+```{r geomcoling}
+jail3 <- jail %>%
+  group_by(race2, sex) %>%
+  summarise(counts=n())
+ggplot(data = jail3 ) + 
+  geom_col(mapping = aes(x = factor(sex), y=counts, fill=factor(race2)))
+```
+
+- `geom_boxplot` for box plots
+```{r geomboxplotting}
+ggplot(data = jail ) + 
+  geom_boxplot(mapping = aes(y = `days in jail`))
+```
+
+- `geom_density` for kernel density estimates
+```{r geomdensing}
+ggplot(data = jail ) + 
+  geom_density(mapping = aes(x = `days in jail`))
+```
+
+- `geom_histogram` for histograms
+```{r geomhisting}
+ggplot(data = jail ) + 
+  geom_histogram(mapping = aes(x = `days in jail`))
+```
+
+- `geom_text` for adding text to plots
+```{r geomtexting}
+ggplot(data = jail ) + 
+  geom_text(mapping = aes(x = `days in jail`, y = `age at arrest`, label = `crime code`) )
+
+#VS
+
+ggplot(data = jail ) + 
+  geom_text(mapping = aes(x = `days in jail`, y = `age at arrest`, label = `crime code`), check_overlap=TRUE)
+```
+
+- `geom_violin` violin plots (similar to bean plots)
+```{r geomviolining}
+ggplot(data = jail ) + 
+  geom_violin(mapping = aes(x = `days in jail`, y = `age at arrest`, color = factor(race2)) )
+```
+
+We can have multiple geom functions for the same data. 
+```{r multigeoming}
+ggplot(data = jail) + 
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`)) +
+  geom_line(mapping = aes(x = `days in jail`, y = `age at arrest`))
+```
+
+Or we can have same geom functions for multiple data.
+```{r multidataing}
+ggplot(data = jail, mapping = aes(x = `days in jail`, y = `age at arrest`)) + 
+  geom_point() + 
+  geom_point(data = filter(jail, city == "CHAMPAIGN"), color="orange") +
+  geom_point(data = filter(jail, city == "URBANA"), color="blue")
+```
+
+### Position adjustments
+
+We can change how the geometric objects are oriented in a plot through a position adjustment as a mapping. Different geometric objects benefit from certain position changes.
+
+- `position_fill` fills in objects with colors
+
+```{r posfilling}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)) , position= "fill")
+```
+
+- `position_dodge` shifts bars side-by-side aka clustered aka grouped
+
+```{r posdodging}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)), position = "dodge" )
+```
+
+- `position_jitter` moves repeated or duplicate points slightly 
+
+```{r posjittering}
+ggplot(data = jail) + 
+  geom_point(mapping = aes(x = `days in jail`, y = `age at arrest`),  position="jitter")
+```
+
+- `position_stack` changing the stacking of bars
+
+```{r posstacking}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)) , position = "stack")
+```
+
+- `coord_flip()` can make vertical bars become horizontal bars
+```{r coordflipping}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)) , position = "stack") +
+  coord_flip()
+```
+
+
+### Adding titles, captions, and labels
+
+We can use very specific functions to add labels and titles within ggplot using `labs()` and `guides()`. The possibilities are numerous and I won't list them all here. See https://ggplot2.tidyverse.org/reference/labs.html for more details on labels. See https://ggplot2.tidyverse.org/reference/guide_legend.html for more details on legends.
+
+```{r morelabeling}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)) , position = "stack") +
+  labs(x= "male vs female", title = "People Booked in Jail", caption="Sample Caption") +
+  guides(fill = guide_legend(title = "Blacks vs All other races"))
+```
+
+
+### Suppressing plot elements in order to add elements
+
+Suppressing elements in ggplot can be very specific to the element we want to suppress, but we usually need to change an argument's value to `element_blank()`. Often suppression comes through modifying the themes `themes()`. See https://ggplot2.tidyverse.org/reference/theme.html for more details on modifying themes.
+```{r}
+ggplot(data = jail ) + 
+  geom_bar(mapping = aes(x = factor(sex), fill = factor(race2)) , position = "stack") +
+  theme(plot.background = element_rect(fill="black"), panel.background = element_rect(fill = "black"), axis.ticks=element_blank(), axis.text = element_text(color = "white"), panel.grid=element_blank(), legend.background = element_rect(fill = "black"), axis.title = element_text(color = "white"), legend.text = element_text(color = "white"), plot.title = element_text(color = "white")) +
+  labs(x= "", title = "People Booked in Jail")
+```
+
+
+***
+
+
+## Visual design principles
+
+We now shift to covering topics of Chapters 1-5 in **Storytelling with Data** by C. Knaflic. The Knaflic uses Microsoft Excel to create all visualizations in the book. The R code and plots below are created with R's standard data importing - `read.csv` - and graphics device - the `plot` function. I challenge all students to recreate these visualizations with tidyverse's functionality.
+
+### **Storytelling with Data** *Ch. 1 The Importance of Context*
+
+
+#### Who: You need to know your audience
+
+- Audiences can be very detail-oriented, big-picture-oriented, or anywhere in between.
+
+- In this class, the audience is usually the Instructor, but sometimes the other students.
+
+- At work, the audience may be your client, supervisor, or team.
+
+- You **must** to alter your data visualization and storytelling for that audience.
+
+#### What: What do you want the audience to know or do?
+
+- In this class, the what may be subject specific, but is usually follows the highest marks on the rubric, i.e. that you were 
+
+- thorough in analysis and thought
+- efficient in coding and organization
+- precise in your execution
+- mindful of creating beautiful visualizations, presentations, and demonstrations.
+
+#### How: How you will you deliver the what?
+
+- Consider what needs to happen in order for the visualization or presentation to be interpreted well. Do those things.
+
+- Creating simple storyboards with pen and paper will help in organizing your story/presentation/demonstration
+
+ 
+As an example of the importance of context, suppose you were to conduct an investigative data analysis project on the full **Champaign County Sheriffs Office Bookings Data**.
+  
+```{r}
+jail$days2 <- as.numeric(jail$`days in jail`)
+jail$date2 <- as.Date(jail$`booking date`, "%m/%d/%Y")
+jail$year2 <- format(jail$date2, "%Y")
+jail$weeksbin <- ifelse(jail$days2 > 6,"At Least 1 Week","Less Than 1 Week")
+jail$blackbin <- ifelse(jail$race=="Black","Black","Non-black")
+```
+
+  
+**Who** : Instructor who considers Champaign County his home; a black man who is concerned with over-policing and unnecessary incarceration of poor black people
+
+**What** : Champaign County bookings for black people versus other racial and ethnic groups, the relationships between race and other demographics, and time spent in jail
+
+**How** : Illustrate booking frequencies for race vs time spent in jail vs crime code
+
+
+***
+  
+  
+### **Storytelling with Data** *Ch. 2 Choosing an Effective Visual*
+
+#### Text
+
+- When there are only a few numbers to show (~ 4 or less), using text may be more effective than a table
+
+**BAD**
+
+```{r}
+rb <- c(sum(jail$race2[jail$year2=="2011"]=="Black", na.rm = TRUE)/length(jail$race2[jail$year2=="2011"]),
+        sum(jail$race2[jail$year2=="2016"]=="Black", na.rm = TRUE)/length(jail$race2[jail$year2=="2016"]))
+rbp <- barplot( rb, main="Booking Rate of Black People")
+rbp
+text(rbp, rb, label=round(rb,2), pos=1)
+axis(1, at=rbp, labels=c("2011","2016"))
+```
+
+**GOOD**
+
+```{r }
+par(mai=c(0,1,1,1))
+barplot(rb,col="white", main="Champaign County Booking Rate of Black People",axes = FALSE, border=NA)
+text(rbp, rb, label=paste0(round(rb,2)*100,"%",""), pos=1, cex=6)
+text(rbp, rb-0.20, label=c("2011","2016"), pos=1, cex=2)
+par(mar=c(5, 4, 4, 2) + 0.1 )
+```
+
+
+#### Scatter plots
+
+- Scatter plots allow us to display numeric data simultaneously in two dimensions (horizontal and vertical axes)
+
+- Ask yourself whether this plot can be better? The answer is usually yes.
+
+**BAD**
+
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", xlab="Days in Jail", sub="among those with at least 1 day in jail")
+sa<-summary(jail$`age at arrest`[jail$days2>0])
+#table(jail$days[jail$days>0])
+```
+
+**GOOD**
+
+```{r}
+length(jail$`crime code`[jail$days2>0 & jail$`age at arrest`<18])
+sort(table(jail$`crime code`[jail$days2>0 & jail$`age at arrest`<18]),decreasing = TRUE)[1:3]
+ycc<-names(sort(table(jail$`crime code`[jail$days2>0 & jail$`age at arrest`<18]),decreasing = TRUE)[1:3])
+
+length(jail$`crime code`[jail$days2>0 & jail$`age at arrest`>=100])
+sort(table(jail$`crime code`[jail$days2>0 & jail$`age at arrest`>=100]),decreasing = TRUE)[1:3]
+occ<-names(sort(table(jail$`crime code`[jail$days2>0 & jail$`age at arrest`>=100]),decreasing = TRUE)[1:3])
+
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",pch=16)
+points(jail$days2[jail$days2>0 & jail$`age at arrest`<18],jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<18] , pch=16, col="green")
+points(jail$days2[jail$days2>0 & jail$`age at arrest`>=100],jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`>=100] , pch=16, col="red")
+text(x=rep(650,length(ycc)),y=seq(115,100,length.out = 3),label=occ,cex=c(1,0.75,0.5),col="red")
+text(x=rep(650,length(ycc)),y=seq(60,45,length.out = 3),label=ycc,cex=c(1,0.75,0.5),col="green")
+```
+
+#### Line plots
+
+- Line plots focus the eyes on relative positions in space
+
+- These kinds of plots are good for continuous data (the real line, probabilities, time points)
+
+- Time is best displayed **horizontally and with equidistant tick marks**
+
+**BAD**
+
+```{r}
+yrs <- split(jail,jail$year2)
+daysyrs <- sapply(yrs,function(a){
+  mean(a$days2,na.rm =TRUE)
+})
+
+daysbla <- sapply(yrs,function(a){
+  mean(a$days2[a$race=="Black"],na.rm =TRUE)
+})
+
+dayswhi <- sapply(yrs,function(a){
+  mean(a$days2[a$race=="White"],na.rm =TRUE)
+})
+
+plot(names(daysyrs),daysyrs, type = "n",ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year")
+lines(names(daysyrs),daysbla, col="red")
+lines(names(daysyrs),dayswhi, col="green")
+legend("bottomright",c("Black","White"),col = c("red","green"), lty=1)
+```
+
+**GOOD**
+
+```{r}
+nmb<-names(sort(table(jail$`crime code`[jail$race=="Black"]),decreasing = TRUE)[1:3])
+nmw<-names(sort(table(jail$`crime code`[jail$race=="White"]),decreasing = TRUE)[1:3])
+
+plot(names(daysyrs),daysyrs, type = "n",ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n")
+lines(names(daysyrs),daysbla, col="blue",lwd=2.5)
+lines(names(daysyrs),dayswhi, col="lightblue", lwd=2)
+lines(names(daysyrs),daysyrs, lwd=2.5)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col="lightblue")
+text(x=rep(2014.5,length(nmw)),y=seq(9,6,length.out = 3),label=nmb,cex=c(1,0.75,0.5),col="blue")
+text(x=rep(2012.5,length(nmb)),y=seq(3,0,length.out = 3),label=nmw,cex=c(1,0.75,0.5),col="lightblue")
+
+```
+
+
+#### Bar plots
+
+- Bar plots focus the eyes on length from a baseline
+
+- These plots are good for displaying categorical data (categories, groups, levels)
+
+- Carefully consider the ordering of the categories since they are being compared
+
+- Keep in mind: "we" read things from top left to top right, then zigzagging downward in a "z" shape until we end in the bottom right.
+
+**BAD**
+
+```{r}
+rb0 <- table(jail$race,jail$weeksbin)[,1]
+rbp0 <- barplot( rb0,main="Booking Counts Among Select Races & Ethnicities", col=1:length(rb0) , axes=TRUE)
+rbp0
+#axis(2, at=seq(2000, 12000, 2000))
+```
+
+**GOOD**
+
+```{r}
+rb0 <- sort(table(jail$race,jail$weeksbin)[,1],decreasing = TRUE)
+rbp0 <- barplot( rb0, border=NA ,horiz = TRUE, axes=TRUE,names.arg = "", 
+                 main="Booking Counts Among Select Races & Ethnicities", col=rev(blues9))
+nn <- names(rb0)
+axis(2, rbp0, las=1, labels=nn, tick=FALSE,mgp=c(3,-0.25,0))
+##axis(1, at=seq(0, 10000, 2000), line=-0.25 )
+text(c(34,21,0,0), rbp0+0.4, label=c(rb0[1:2],rep("",length(rb0)-2)), pos=1, cex=1.75, las=1, col="white")
+```
+
+#### Plots to be avoided (all from Knaflic's **Storytelling with Data** book)
+ 
+- pie charts
+
+![](https://uofi.box.com/shared/static/4yklykcm0u8wiv9rxix06rsn7zh634zg.png)
+
+- donut charts
+
+![](https://uofi.box.com/shared/static/6ybtg0ncag78awejn1p911944vvvl4c7.png)
+
+- 3-dimensional (3D) plots
+
+![](https://uofi.box.com/shared/static/t35xdp85alvtmbs428j4jkkgydbjgkkq.png)
+
+- plots with two or more axes in one dimension
+
+![](https://uofi.box.com/shared/static/4zeh9dyut200xus0letuvj3j74qfom4j.png)
+
+
+***
+
+### **Storytelling with Data** *Ch. 3 Clutter Is Your Enemy *
+
+- **Clutter** is any visual thing that does not increase your/our/the audience's understanding.
+
+- When we take in information that is called **cognitive load**.
+
+- The audience deserves low cognitive load.
+
+- Ideally we want to create data visualizations that are *high signal* (information we want to communicate) and *low noise* (distracting or useless information, i.e. clutter)
+
+- Remove clutter in your plots!
+
+
+```{r}
+length(jail$`crime code`[jail$days2>0 & jail$`age at arrest`<18])
+ycc<-names(sort(table(jail$`crime code`[jail$days2>0 & jail$`age at arrest`<18]),decreasing = TRUE))
+```
+
+
+**ORIGINAL**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",pch=16)
+```
+
+
+#### 6 Gestalt Principles of Visual Perception
+
+1. **proximity**: using space and items to create groups or patterns that guide the eyes
+
+
+**LESS CLUTTER**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",
+     pch=16, bty="n")
+```
+
+
+2. **similarity**: objects with the same visual cue, such as color, shape, size, or orientation, are in a group
+
+**LESS CLUTTER WITH COLOR**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",
+     pch=16, bty="n")
+points(jail$days2[jail$days2>0 & jail$`age at arrest`<18],
+       jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<18] , 
+       pch=16, col="blue")
+```
+
+**LESS CLUTTER WITH SHAPE**
+```{r}
+plot(jail$days2[jail$days2>0 & jail$`age at arrest`<100],
+     jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100], 
+     ylim=c(min(jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100],na.rm=TRUE),max(jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100],na.rm=TRUE)),
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col=1,sub="among those with at least 1 day in jail",
+     pch=16)
+points(jail$days2[jail$days2>0 & jail$`age at arrest`<18],
+       jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<18] , pch=8)
+```
+
+**LESS CLUTTER WITH SHAPE & COLOR**
+```{r}
+plot(jail$days2[jail$days2>0 & jail$`age at arrest`<100],
+     jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100], 
+     ylim=c(min(jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100],na.rm=TRUE),max(jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<100],na.rm=TRUE)),
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",
+     pch=16)
+points(jail$days2[jail$days2>0 & jail$`age at arrest`<18],
+       jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<18] , 
+       pch=8, col="blue")
+```
+
+3. **enclosure**: items that are enclosed or bounded are in a group
+
+**LESS CLUTTER WITH A BOX ENCLOSURE**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col="gray",sub="among those with at least 1 day in jail",
+     pch=16)
+rect(-10,18,210,15)
+```
+
+**LESS CLUTTER WITH A BAND**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col=1,sub="among those with at least 1 day in jail",
+       type = "n")
+abline(h=16,col=rgb(220/255,220/255,220/255,alpha = .85),lwd=15)
+points(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0], pch=16)
+```
+
+4. **closure**: when we first see items and they appear to be structured or have a certain form
+
+**LESS CLUTTER WITH CLOSURE, ENCLOSURE, & SIMILARITY**
+```{r}
+plot(jail$days2[jail$days2>0],jail$`age at arrest`[jail$days2>0],
+     main="Age at Arrest versus Days in Jail", ylab = "Age at Arrest in Years", 
+     xlab="Days in Jail", col=1,sub="among those with at least 1 day in jail",
+     pch=16, bty="n")
+abline(h=16,col=rgb(220/255,220/255,220/255,alpha = .85),lwd=15)
+points(jail$days2[jail$days2>0 & jail$`age at arrest`<18],
+       jail$`age at arrest`[jail$days2>0 & jail$`age at arrest`<18] , 
+       pch=16, col="blue")
+```
+
+
+5. **continuity**: when we first see objects, we view them along the smoothest paths, which creates continuous flow
+
+**ORIGINAL**
+```{r}
+rb0 <- sort(table(jail$race,jail$weeksbin)[,1])
+rbp0 <- barplot( rb0, border=NA ,horiz = TRUE, axes=FALSE,names.arg = "", 
+                 main="Booking Counts Among Select Races & Ethnicities", col="gray")
+rb0
+rbp0
+nn <- names(rb0)
+nm<-rev(nn)
+axis(2, rbp0, las=1, labels=nn, tick=TRUE)
+#axis(1, at=seq(0, 10000, 2000), line=-0.25 )
+#text(rev(c((rb0-1100)[1],4650,500,0,0)), rbp0+0.4, label=c(rb0[1:3],rep("",length(rb0)-3)), pos=1, cex=1.75, las=1, col="white")
+```
+
+**LESS CLUTTER WITH CONTINUITY**
+```{r}
+rb0 <- sort(table(jail$race,jail$weeksbin)[,1])
+rbp0 <- barplot( rb0, border=NA ,horiz = TRUE, axes=FALSE,names.arg = "", 
+                 main="Booking Counts Among Select Races & Ethnicities", col="gray")
+rb0
+rbp0
+nn <- names(rb0)
+nm<-rev(nn)
+axis(2, rbp0, las=1, labels=nn, tick=FALSE,mgp=c(3,-0.15,0))
+#axis(1, at=seq(0, 10000, 2000), line=-0.25 )
+#text(rev(c((rb0-1100)[1],4650,500,0,0)), rbp0+0.4, label=c(rb0[1:3],rep("",length(rb0)-3)), pos=1, cex=1.75, las=1, col="white")
+```
+
+6. **connection**: when we first see items, we view them as physically connected before we notice other attributes
+
+**ORIGINAL**
+```{r}
+plot(names(daysyrs),daysyrs, type = "n",ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n")
+points(names(daysyrs),daysbla, col="blue", pch=16, lwd=2)
+points(names(daysyrs),dayswhi, col="lightblue",pch=16, lwd=2)
+points(names(daysyrs),daysyrs, lwd=2,pch=16)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col="lightblue")
+```
+
+**LESS CLUTTER WITH CONNECTION**
+```{r}
+plot(names(daysyrs),daysyrs, type = "n",ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n")
+lines(names(daysyrs),daysbla, col="blue",lwd=2.5)
+lines(names(daysyrs),dayswhi, col="lightblue", lwd=2)
+lines(names(daysyrs),daysyrs, lwd=2.5)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col="lightblue")
+```
+
+### Other visual considerations
+
+- **alignment**: whether items are straight-edge or not, centered or left/right-justified
+
+**LESS CLUTTER WITH ALIGNMENT**
+```{r}
+par(mai=c(0,1,1.5,0))
+rb0 <- sort(table(jail$race,jail$weeksbin)[,1])
+rbp0 <- barplot( rb0, border=NA ,horiz = TRUE, axes=FALSE,names.arg = "", 
+                 main="Booking Counts Among Select Races & Ethnicities", col="gray")
+rb0
+rbp0
+nn <- names(rb0)
+nm<-rev(nn)
+axis(2, rbp0, las=1, labels=nn, tick=FALSE,mgp=c(3,-0.15,0))
+axis(3, at=seq(0, 40, 8), line=-0.25)
+par(mar=c(5, 4, 4, 2) + 0.1 )
+```
+
+- **white space**: white space is powerful and necessary to see variations better
+
+**ORIGINAL**
+```{r}
+plot(names(daysyrs),daysyrs, type = "n",ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n")
+rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col = "lightgrey")
+grid(col="white")
+lines(names(daysyrs),daysbla, col="blue",lwd=2.5)
+lines(names(daysyrs),dayswhi, col="lightblue", lwd=2)
+lines(names(daysyrs),daysyrs, lwd=2.5)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col="lightblue")
+
+
+```
+
+**LESS CLUTTER WITH WHITE SPACE**
+```{r}
+plot(names(daysyrs),daysyrs, type = "n", ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n", axes =FALSE)
+lines(names(daysyrs),daysbla, col="blue",lwd=2.5)
+lines(names(daysyrs),dayswhi, col=rgb(0,0,255/255,  alpha=0.667), lwd=2)
+lines(names(daysyrs),daysyrs, lwd=2.5)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col=rgb(0,0,255/255,  alpha=0.5))
+axis(1, 2011:2016, tick=FALSE)
+axis(2, seq(0,20,5), tick=FALSE)
+```
+
+- **contrast**: taking advantage of light to show differences
+
+**LESS CLUTTER WITH CONTRAST**
+```{r}
+plot(names(daysyrs),daysyrs, type = "n", ylim=c(0,max(daysbla,dayswhi)),xlab="Years",ylab="Number of Days in Jail", main = "Mean # of Days in Jail for Per Year",bty="n", axes =FALSE)
+lines(names(daysyrs),daysbla, col="blue",lwd=2.5)
+lines(names(daysyrs),dayswhi, col="orange1", lwd=2)
+lines(names(daysyrs),daysyrs, lwd=2.5)
+text(2012,17,"Average for All Races")
+text(2011.25,22,"Black",col="blue" )
+text(2011.25,12,"White",col="orange")
+axis(1, 2011:2016, tick=FALSE)
+axis(2, seq(0,20,5), tick=FALSE)
+```
+
+
+### **Storytelling with Data** *Ch. 4 Focus Your Audience's Attention*
+
+#### Preattentive attributes 
+
+These (size, shape, color, position, etc.) can be used to direct your audience's attention to where you want and to create a visual hierarchy of elements
+
+![Knaflic's Storytelling with Data Fig. 4.4](https://uofi.box.com/shared/static/7pp0a10a81qriov5rsk12ugkx354bugr.png)
+
+#### Preattentive *text*
+
+![](https://uofi.box.com/shared/static/15u8tmj8m855ddg4ormwgpm5h10yghti.png)
+
+**VISUAL HIERARCHY**
+
+![Knaflic's Storytelling with Data Fig. 4.6](https://uofi.box.com/shared/static/0cyup8t02aj40q3519v7i6zygednyjhr.png)
+
+#### Preattentive *plots*
+
+**ORIGINAL**
+
+![Knaflic's Storytelling with Data Fig. 4.7](https://uofi.box.com/shared/static/41z7mmdnz7oc3n09sqsyli728zvlr1db.png)
+
+**IMPROVED**
+
+![Knaflic's Storytelling with Data Fig. 4.8](https://uofi.box.com/shared/static/enpf1sqfomdp86bic9gxl67y3eo8fn5f.png)
+
+**MORE IMPROVED**
+
+![Knaflic's Storytelling with Data Fig. 4.9](https://uofi.box.com/shared/static/wrv7vvyzztzo0hx1cjh65dpl6a66enbb.png)
+
+### **Storytelling with Data** *Ch. 5 Think Like a Designer*
+
+As designers e should care about **form** (what we want the audience to do with the data) and **function** (the visualization that allows the function to happen with ease)
+
+
+#### Affordance
+
+Affordances are aspects that tell the audience how to *use* and *interact* with the data visualizations.
+
+- Use preattentive attributes smartly and sparingly.
+
+- Preattentive attributes can overwhelm and distract if used too often in the same visualization
+
+- Does my visualization need this to make it interpretable?
+
+
+#### Accessibility
+
+As designers we should be considerate of the audience's abilities and technical skills, making sure everyone in the room has the chance to interpret our work.
+
+- Remove unnecessary complexity in favor of simplicity.
+
+- Because of colorblindness, consider avoiding red and green in favor of blue and orange.
+
+- Use text smartly.
+
+- If you want the audience to reach a specific conclusion, write it in the visualization.
+
+
+#### Aesthetics 
+
+Pretty and attractive visualizations allows the audience to be patient with us (as presenters) and builds their tolerance of our designs i.e. data visualizations.
+
+- Use color sparingly.
+
+- Organize items on the page to be aligned vertically and horizontally. Using grid lines to guide your eyes as you are making the placement decision.
+
+-  Don't be afraid of white space. Use it often!
+
+
+#### Acceptance
+
+Good design is only good if the audience accepts the design.
+
+- Using side-by-side visualizations helps to persuade an audience that your visualization is better.
+
+- Show your designs to colleagues and others for feedback before presenting to your audience.

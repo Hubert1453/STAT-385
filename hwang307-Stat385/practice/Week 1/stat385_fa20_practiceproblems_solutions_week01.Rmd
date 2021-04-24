@@ -1,0 +1,37 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 1 Practice Problems
+### Created by Christopher Kinson
+
+1. (Syllabus, Markdown) Who are the teaching assistant (TA) and course assistants (CAs)? Write your answer as a list with the TA's name in bold text and each CA's name in italic text.
+
+*The TA is Michael Wieck-Sosa. As of 08-22-2020, there are no CAs for the course.*
+
+2. (Syllabus, GitHub, Markdown) Let the following list represent the incorrect order of steps to begin and submit the first homework assignment. Now, list the items in the correct order.
+
+The correct order is:
+
+**1** Pull homework1 from the homework repo in GitHub.
+
+**2** Start working on the homework1 by myself.
+
+**3** When I get stuck on a problem in homework1, ask a question in the Issues page.
+
+**4** Push homework1 into my repo (the one named with my netid).
+
+
+3. (RMarkdown) Using RMarkdown, place the following code in an R code chunk such that it runs upon rendering (or knitting) this file to html.
+
+```{r}
+library(tidyverse)
+fzpizza_data1 <- read_csv("https://uofi.box.com/shared/static/ko6uqp336nruywnormrp6euo9qrraigs.csv")
+head(fzpizza_data1, 5)
+tail(fzpizza_data1, 5)
+``` 

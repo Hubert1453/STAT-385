@@ -1,0 +1,171 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 4 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- **An Introduction to R** *Chapter 5 Arrays and matrices*
+
+- **An Introduction to R** *Chapter 8 Probability distributions*
+
+
+***
+
+### ICYMI: The Git Golden Rule is to always pull your repo before you push.
+
+### ICYMI: [**An Introduction to R**](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) by Venables, Smith and the R Core Team is one of the reference textbooks in the syllabus.
+
+
+***
+
+
+## **An Introduction to R** *Chapter 5 Arrays and matrices*
+
+Arrays are general atomic objects of any **dimension**. Values fill in the array in column major order. The `dim()` function is used to see the length of each dimension of an object.
+
+```{r}
+a <- array(1:8, dim=c(2,3,2))
+dim(a)
+```
+
+Subsetting through the use of the index such that locations can be selected with subscripts (discussed in Week 2 Notes) 
+```{r}
+a[2,1,1]
+a[2,1,]
+a[1,,]
+a[,1,]
+a[,,1]
+```
+
+or as index matrix.
+```{r}
+im <- array(c(1,1,2,2,2,3,2,3),dim=c(4,2))
+im
+a[im]
+```
+
+A **matrix** is a two-dimensional array. It’s atomic and has two subscripts (row,column). We could use the `array()` function to create a matrix. However, there are other ways to create a matrix.
+
+We could use the `matrix()` function.
+```{r}
+mat <- matrix(1:4,nrow=2,ncol=2)
+mat
+```
+
+Or the `diag()` function, which makes a square matrix with different values along the diagonal.
+```{r}
+mat <- diag(1:2,2)
+mat
+```
+
+Or the `cbind()` function, which binds **columns** together to form a matrix.
+```{r}
+mat <- cbind(rep(1,3), rep(2,3))
+mat
+```
+
+Or the `rbind()` function, which binds **rows** together to form a matrix.
+```{r}
+mat <- rbind(rep(1,3), rep(2,3))
+mat
+```
+
+Both `cbind` and `rbind` allow for recycled vector elements if one vector is not the same length as the remaining vectors. Recycling is the idea that when vectors are of different length, the vector with shorter length will have repeated values (cycling from first to last) to attain the same length as the longer vector. See the example below.
+```{r}
+v1 <- letters[1:10]
+v2 <- LETTERS[1:20]
+cbind(v1, v2)
+```
+
+In addition, we can use the `head()` or `tail()` functions to show the first few or last few observations of an object in R.
+```{r}
+head(a)
+head(letters)
+tail(iris)
+```
+
+We can also perform operations on matrices and arrays. Numeric matrices can be multiplied (or vectors multiplied by matrices) using the `%*%` operator.
+```{r}
+A <- matrix(1:4, ncol = 2)
+B <- rbind(rep(1,2), rep(2,2))
+A %*% B #result is 2 by 2
+c(10,5) %*% A #result is 1 by 2
+```
+
+Additionally, we may need to transpose arrays and matrices for other calculations using the `t()` function. Or to invert an invertible matrix using `solve()`.
+```{r}
+t(A)
+solve(A)
+```
+
+A special class of arrays is the **table** class in R. These contingency tables are useful for counting the frequency of factors or other categorical variables. Cross-classification tables are made when there are two or more factors present.
+```{r}
+table(iris$Species)
+cols1 <- c(rep("red",75), rep("green", 25), rep("blue", 50))
+table(cols1)
+table(cols1, iris$Species)
+```
+
+
+***
+
+
+## **An Introduction to R** *Chapter 8 Probability distributions*
+
+R has almost all of the typical probability distributions that you have seen in STAT 100, 200, or 400. Thus we can use R to determine probabilities from these statistical tables. If "prob" represents a particular probability distribution, then we can compute the cumulative distribution function (`dprob`), the probability density function (`pprob`), the quantile function (`qprob`) and a realization or random deviate from the distribution (`rprob`).
+
+In this course, we'll mostly focus on generating random deviates from a given probability distribution.
+```{r}
+runif(10) #min=0, max=1
+rnorm(10) #mean=0, sd=1
+rt(10, 2) #df=2
+```
+Notice that these are **continuous distributions** and will almost never produce integers as realizations. If we wanted integers that followed known probability distributions, we could round these real numbers to be integers with the `round()` function.
+```{r}
+round(runif(10),0) 
+round(rnorm(10),0)
+round(rt(10, 2),0) 
+```
+ 
+Better yet, **discrete** distribution random deviates might be the way to go.
+```{r}
+rbinom(10, 5, 0.7)
+rgeom(10, 0.7)
+rpois(10, 2)
+```
+
+*Because randomization will occur in future discussions, I want to make you aware of the idea of seeds and sampling.* 
+
+### **It's extremely important that you make sure your version of R is the most up to date from this point on.**
+
+Think of seeds as values our machine requires to produce random numbers. Every computer (and R session) has a starting seed number that is almost unique to your machine at any time. But when we might do more advanced computation (e.g., parallel programming or reproducible simulations), it will benefit us to set the seed number to be the same for all computers so that everyone can achieve exactly the same result. We can choose a value for the starting seed of a random number generator or let the starting seed value be chosen randomly (not always advised for repeated experiments).
+```{r}
+set.seed(runif(1))
+runif(5) #this result will change
+set.seed(385)
+runif(5) #this result won't ever change
+set.seed(runif(1))
+runif(5) #this result will change and will not match any of the results above
+```
+
+These seed numbers affect randomization completely and will alter the random deviates produced for any probability distribution. Sometimes, though, we don't want randomization to be based on a probability distribution. Sometimes, we simply want a random set of values given a set of values. Sampling in this way with or without replacement can also serve as a permutation of known values to change the arrangement. We can take a sample of values in R using the `sample()` function.
+```{r}
+sample(1:10, 10, replace=FALSE)
+sample(1:10, 10, replace=TRUE)
+sample(letters)
+set.seed(385)
+vec0 <- runif(10)
+sample(vec0)
+```

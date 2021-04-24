@@ -1,0 +1,32 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Week 3 Practice Problems
+### Created by Christopher Kinson
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement) Create a vector (named as `vec1`) with 11 elements from a equally spaced sequence of that begins with 1 and ends with 21. Print the resulting `vec1`.
+
+```{r}
+vec1 <- seq(1,21,2)
+vec1
+```
+
+2. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement) Create a vector (named as `vec2`) which coerces vec1 to a factor with levels being the corresponding letters of the alphbet at the positions of the values of `vec1`. Print the resulting `vec2`.
+
+```{r}
+vec2 <- factor(vec1)
+levels(vec2) <- letters[vec1]
+vec2
+```
+
+3. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement) Create a vector (named as `vec3`) which sorts `vec2` in decreasing order. Print the resulting `vec3`.
+
+```{r}
+vec3 <- sort(vec2,decreasing = TRUE)
+vec3
+```

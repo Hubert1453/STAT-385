@@ -1,0 +1,107 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 5 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- **An Introduction to R** *Chapter 6 Lists and data frames*
+
+- Missing values
+
+
+***
+
+### ICYMI: The Git Golden Rule is to always pull your repo before you push.
+
+### ICYMI: [**An Introduction to R**](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) by Venables, Smith and the R Core Team is one of the reference textbooks in the syllabus.
+
+
+***
+
+
+## **An Introduction to R** *Chapter 6 Lists and data frames*
+
+### Lists
+
+Lists (recursive structures) are one of the most flexible data objects to work. Lists are made up of components, and the components may be of any mode. We use the function `list()`.
+```{r}
+?list
+y <- list(y1=letters, y2=LETTERS, y3=iris[1:26,])
+y
+```
+
+Components in a list are always numbered and can be called or referenced with their numbers as locations much like arrays and matrices through indexing. Components do not have to be named, but could be named, which would allow for more flexible way to call or reference the components in the list.
+```{r}
+y[[1]]
+y$y1
+y[[2]][1]
+y[[3]]
+y[[3]][,1]
+y[[3]]$Species
+```
+
+### Data Frames
+
+A data frame (a rectangular data object with rows and columns) is a list of class "data.frame". To create a data frame, use `data.frame()`. If an object is not a data frame, then it can be coerced into a data frame using `as.data.frame()`.
+```{r}
+data.frame(y1=letters, y2=LETTERS)
+as.data.frame(cbind(letters,order(letters)))
+data.frame(newcol=2, `newer col`=letters)
+```
+
+Data frames in R have some quirky default behaviors including:
+
+- character vectors are coerced to be factors
+
+- variable names are automatically adjusted and sometimes in uncontrolled ways
+
+- rows may be named with a variable or other object
+
+- all columns must have the same length; no recycling
+
+
+### Tibbles (Bonus content)
+
+Tibbles (a tidyverse data frame) were created to eliminate the data.frame quirks mentioned above to smooth out data processing.
+```{r}
+library(tidyverse)
+tibble(y1=letters, y2=LETTERS)
+as_tibble(iris)
+tibble(newcol=2, `newer col`=letters)
+```
+
+One quirky default behavior of tibbles occurs when printing them. By default, we can only see a print out of 10 rows and only the columns that fit on one screen. Some values in the columns are abbreviated (written in short form) while remaining columns are written in text form without values in the printout. But we can alter the default behavior.
+```{r}
+iris2 <- tibble(iris,spec2=paste0(iris$Species,seq(0,1,length.out = 50)))
+iris2
+options(tibble.print_max = 50, tibble.print_min = 10)
+as_tibble(iris2)
+options(tibble.width = Inf)
+as_tibble(iris2)
+```
+***Reminder: A data frame is a list. A tibble is a data frame. A tibble is a list. A list is not a data frame. A list is not a tibble.***
+
+***
+
+
+## Missing values
+
+Missing values are often represented as blanks, ".", or " " in data frames. They are slightly different from null values and unknown values. Null values (`NULL` in R) are undefined values often used in R coding to create empty objects. Unknown values are usually noted or marked as "unknown" in a dataset. Older datasets might mark a value as "9999" or "99999" to represent unknown values. A missing value could be unknown or NULL or an actual value that just never made it into the data frame. But unknown values are not necessarily missing when they are represented as "unknown" or "9999" within a data frame. There are some things we can glean from missing values.
+
+**Missing not at random** is a category of missing values in which the reason the values are missing is related to the values that are missing. This category occurs in the real world and does not allow for data analysis to be done without bias.
+
+**Missing at random** is a category of missing values in which there is a relationship between the missing values and the observed values. The missingness for this category is not truly random. This category occurs in the real world and does not allow for data analysis to be done without bias.
+
+**Missing completely at random** is a category of missing values in which there is no relationship between missing values and observed values (data that we can see). This category rarely occurs in the real world, but does allow for data analysis to be done without bias.

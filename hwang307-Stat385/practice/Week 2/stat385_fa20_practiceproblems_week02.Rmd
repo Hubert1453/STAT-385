@@ -1,0 +1,33 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Week 2 Practice Problems
+### Created by Christopher Kinson
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. (R Introduction, R Simple manipulations, Markdown) Suppose I don't remember exactly what R's median function does. Which line of code will query R about it and bring up the help page? Write your answer in bold and italic text.
+
+a. `help(median)`
+b. `?median`
+c. both a and b
+d. neither a nor b
+
+***c. both a and b***
+
+2. (Using Git and GitHub) Here is the scenario: 
+```
+The whole class is working on the final project Shiny app. Student X creates a menu for the final project Shiny app on their local machine. They show it to the Instructor and student X decides to commit and push their menu as a contribution to the final project. But Student X never pulled the class project repo first.
+```
+Will this result in a successful push or a merge conflict to the class project repo?
+
+***merge conflict***
+
+3. (R Simple manipulations, R Numbers and vectors) Calculate 10 × 4 - 2 × (4² ÷ 4) ÷ 2 ÷ 1/2 + 9 using R programming and a code chunk to show the result.
+
+```{r}
+10*4-2*((4^2)/4)/2/(1/2)+9
+```

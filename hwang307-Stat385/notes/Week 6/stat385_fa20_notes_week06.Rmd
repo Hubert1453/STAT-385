@@ -1,0 +1,166 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 6 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Vectorization
+
+- **An Introduction to R** *Chapter 10 Writing your own functions*
+
+- Helpful coding principles
+
+***
+
+## Vectorization
+
+Vectorization is the idea of taking advantage of the vector structure in your programming software to do repeatable computations efficiently. It is a concept that will surely speed up computing time (compared to traditional loops) and works to optimize repeated operations. Vectorized functions occur in two different ways. 
+
+1. a function that does the same operation on a vector of values as it would do on each single value and returns a vector of values e.g. `sqrt()`
+
+2. a function that takes a vector and produces one single value based on the whole vector e.g. `sum()`
+
+For more information on vectorization in R, do read **[The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf)**, particularly Chapters 3-4.
+
+Here are some vectorized functions in R: `ifelse()`, `is.na()`, `sqrt()`, `log()`, `abs()`, `sum()`, `colSums()`, `rowSums()`, `mean()`, `colMeans()`, `rowMeans()`, `unique()`. Check the table below. Some are more popular than others. You may find other functions that are even more useful.
+
+function | sample code | part of output |
+---|---|---|
+length | `length(iris$Species)` | `r length(iris$Species)` |
+nrow | `nrow(iris)` | `r nrow(iris)` |
+ncol | `ncol(iris)` | `r ncol(iris)` |  
+seq_along | `seq_along(c(1, 3, 5, 7, 8, 9))` | `r seq_along(c(1, 3, 5, 7, 8, 9))` |
+ifelse | `ifelse(iris$Species=="setosa",1,0)`| `r head(ifelse(iris$Species=="setosa",1,0))`|
+paste | `paste(iris$Species,"iris",1:150)`| `r head(paste(iris$Species,"iris",1:150))`| 
+split | `split(iris,iris$Species)`| |
+which | `which(iris$Sepal.Length>6.8)`| `r which(iris$Sepal.Length>6.8)`|
+rowSums | `rowSums(iris[,-5])` | `r head(rowSums(iris[,-5]))`|
+colSums | `colSums(iris[,-5])` | `r colSums(iris[,-5])`|
+rowMeans | `owMeans(iris[,-5])` | `r head(rowMeans(iris[,-5]))`|
+colMeans | `colMeans(iris[,-5])` | `r head(colMeans(iris[,-5]))`|
+complete.cases| `complete.cases(iris$Species)` | `r head(complete.cases(iris$Species))`|
+is.na | `is.na(iris)` | `r head(is.na(iris))`|
+
+The code below shows an advantage in coding efficiency and readability through the use of vectorization.
+
+```
+#not vectorized
+set.seed(13)
+n <- 10
+zz<-rep("",n)
+for (i in 1:n){
+ z <- rnorm(1) # generate normal random variable
+ if (abs(z) > 1) zz[i]="Yes!"
+}
+zz
+
+#vectorized
+set.seed(13)
+z<-rnorm(10)
+zz[abs(z)>1]<-"Yes!"
+zz
+```
+
+```{r}
+1+2+3+4+5+6 #not vectorized
+
+sum(1:6) #vectorized
+```
+
+```{r}
+# determine if 7919 is prime or not
+7919%%3 #not a vectorized approach
+7919%%5
+7919%%7
+7919%%11
+7919%%13 #...
+7919%%89
+
+# determine if 7919 is prime or not
+num <- 7919%%(1:7919) #a vectorized approach
+num[num==0]
+#it's prime
+```
+
+***
+
+
+## **An Introduction to R** *Chapter 10 Writing your own functions*
+
+The crux of what you do as a programmer is create your own tools. These tools can greatly speed up data analysis, data wrangling, data visualization, modeling, etc. R allows users to create their own functions (i.e. user-defined functions) using the `function` and with at least one argument that can be named or unnamed:
+
+```
+newfunction <- function(argument1, namedarg=argument2){
+  expressions
+}
+```
+
+Using the function to see the results becomes:
+
+```
+newfunction(x,y)
+```
+
+Your custom functions can be complicated or simple. It will depend on the nature of what you want to build and your programming skill set.
+
+### Example 1: A t-statistic for the two-sample case (found in the Intro to R textbook)
+
+```{r}
+twosam <- function(y1, y2) {
+  n1 <- length(y1); n2 <- length(y2)
+  yb1 <- mean(y1); yb2 <- mean(y2)
+  s1 <- var(y1); s2 <- var(y2)
+  s <- ((n1-1)*s1 + (n2-1)*s2)/(n1+n2-2)
+  tst <- (yb1 - yb2)/sqrt(s*(1/n1 + 1/n2))
+  tst
+}
+twosam(rnorm(20),rnorm(20))
+```
+
+
+### Example 2: An n-dimensional correlation matrix with exchangeable correlation rho
+
+```{r}
+exc <- function(n,rho){
+  mat <- array(rho,dim=c(n,n))
+  mat2 <- array(c(1:n,1:n),dim=c(n,2))
+  mat[mat2] <- 1 
+  mat
+}
+exc(5,0.5)
+```
+
+
+### Example 3: Aggregating over a dataset to compute the MAD (median absolute deviation from the median)
+
+```{r}
+madm <- function(x){
+  median(abs(x-median(x)))
+}
+madm(rnorm(2,20))
+```
+
+
+***
+
+## Helpful coding principles
+
+- DRY. Don't Repeat Yourself.
+
+- KISS. Keep It Simple Shawty.
+
+- When it is is reasonable (time & effort) do vectorize your code. Do not vectorize your code when it is not reasonable (time & effort).
+
+- Document your code with comments.

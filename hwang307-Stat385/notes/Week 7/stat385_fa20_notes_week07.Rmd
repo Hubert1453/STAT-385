@@ -1,0 +1,336 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 7 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- **An Introduction to R** *Chapter 9 Grouping, looping, and conditional execution*
+
+- Apply family of functions
+
+
+***
+
+## **An Introduction to R** *Chapter 9 Grouping, looping, and conditional execution*
+
+### Grouped Expressions
+
+Expressions are **recursive** structures, much like functions, that make up the DNA of R itself. Expressions are objects that captures the structure of the code without evaluating it. Expressions may be quite complex `y ~ .` or surprisingly simple, e.g. `<-`. Expressions can be grouped with braces `{}` and often combined with conditional execution and loops.
+
+### Conditional Execution
+
+The `if` statement requires a TRUE logical condition (expression) in order for the expressions to run. Multiple expressions, i.e. grouped expressions can be used which explains the `{}`.  Multiple conditions can be combined with logical operators `&` and `|`. The else is used if the user intends for an alternative set of expressions to be executed when the logical condition is FALSE.
+
+```
+if (condition) {
+  expressions
+  } else {
+    expressions
+  }
+```
+
+### Loops
+
+![](https://media.giphy.com/media/zA9wlONvvIorC/giphy.gif)
+
+We use loops:  
+
+- when we want to do repetitive actions on observations
+
+    - the repetitive actions happen in the loop body  
+
+- to show how values change over iterations
+
+- because we want efficient coding  
+
+- within loops, called nested loops, for more complicated calculations
+
+There are 2 main type of loops:  
+
+- **index-controlled** loops  
+
+    - actions are repeated for a predetermined number of times using an index or counter  
+- **condition-controlled** loops  
+
+    - actions are repeated once a condition is satisfied  
+
+    - condition checked at the bottom or at top of the loop
+
+#### The for loop (index-controlled)
+
+![](https://uofi.box.com/shared/static/pu35sgyu0pqeesuuzrspij6famx4ba9e.png)
+
+The index is determined by the expression and changes each time the grouped expressions execute until the index reaches the maximum value of the expression. To stop the for loop, we must smartly utilize the dimension of the expression.
+
+```
+for (index in expression) {
+ expressions
+}
+```
+
+```{r}
+for(i in 1:6) print(1:i)
+```
+
+```{r}
+ab <- NULL
+matrix1 <- matrix(rnorm(200),ncol = 2)
+for(i in 1:10){
+  ab <- rbind(ab, matrix1[(10*(i-1)+1):(10*i),])
+}
+ab
+```
+
+```{r}
+bc <- matrix(0, nrow = 100, ncol = 2)
+matrix1 <- matrix(rnorm(200),ncol = 2)
+for(i in 1:10){
+  bc[(10*(i-1)+1):(10*i),] <- matrix1[(10*(i-1)+1):(10*i),]
+}
+bc
+```
+
+
+```{r}
+x <- 1:20
+for(i in 1:length(x)){
+  if(!(x[i] %% 2 == 0)) x[i] <- -x[i]
+}
+x
+```
+
+```{r}
+set.seed(13)
+nc <- nr <- 8
+mat <- matrix(0, nrow = nr, ncol = nc)
+for(i in 1:nr){
+  for(j in 1:nc){
+    z <- rnorm(1)
+    if(abs(z) > 1) mat[i, j] <- z
+  }
+}
+mat
+```
+
+#### The while loop (condition-controlled & checked at the top)
+
+![](https://uofi.box.com/shared/static/gmrkhaq7rgyklw1tvqrepveo2rivj8cm.png)
+
+The logical condition should be TRUE at the very beginning before the grouped expressions can be repeated. Once the condition is FALSE, the loop stops.
+
+```
+while (condition) {
+ expressions
+}
+```
+
+Some examples of the while loop.
+```{r}
+set.seed(13)
+cond <- TRUE
+i <- 1
+
+while(cond){
+  u <- runif(1)
+  if(u < 1/100) cond <- FALSE
+  cat("iteration: ", i, "unif: ", u, "\n")
+  i <- i + 1
+}
+```
+
+```{r}
+precision <- 0.001
+x <- 0.001 
+
+while(pgamma(x, shape = 1, rate = 1) < 0.95){
+  x <- x + precision
+}
+x
+```
+
+```{r}
+y <- 1:16
+head(y)
+i <- 1
+while (y[i] < 9){
+ plot(y[1:i], (y[1:i]-4)^2, type="l")
+ i <- i+1
+}
+```
+
+
+#### The repeat loop (condition-controlled & checked at the bottom)
+
+![](https://uofi.box.com/shared/static/vqi9zzrj252sbma0d54x29pt0g6d9u28.png)
+
+The grouped expressions execute until the condition is TRUE. When the condition is TRUE, the `break` statement provides the end and exit of the loop. Without the `break`, the loop never stops.
+
+```
+repeat{
+ expressions
+ if (condition) break
+}
+```
+
+Some examples of the repeat loop.
+```{r}
+set.seed(13)
+i <- 1
+repeat{
+  print(i)
+  i <- i + 1
+  if(runif(1) < 1/100) break
+}
+```
+
+```{r}
+precision <- 0.0001
+x <- 0.001 
+repeat{
+  x <- x + precision
+  if(pgamma(x, shape = 1, rate = 1) > 0.95) break
+}
+x
+```
+
+
+***
+
+## Apply family of functions
+
+The apply family is a set of functions that can simplify complicated *for loop* coding.
+
+![](https://media1.tenor.com/images/f552638ff2e4099790a44c1ccf245301/tenor.gif?itemid=3965570)
+
+Taken from [The apply() family](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family): The apply() family pertains to the R base package and is populated with functions to manipulate slices of data from matrices, arrays, lists and data frames in a repetitive way. These functions allow crossing the data in a number of ways and avoid explicit use of loop constructs. They act on an input list, matrix or array and apply a called function with one or several optional arguments.
+
+
+### Why apply?
+
+[Read this](https://nicercode.github.io/guides/repeating-things/). Highlights from this reading include:
+
+- Apply functions allow one to write **literate** code. On the other hand, *for loops* are not very expressable, i.e. they take a lot of code to do what you want.
+- *for loops* permit you to write bad code
+- variables created in the *for loop* are stored in the global environment, which is dangerous. [More on this](https://www.learncpp.com/cpp-tutorial/4-2a-why-global-variables-are-evil/). Mini-digression on this issue:
+
+``` 
+## for loop 
+n <- 100 # constant global variable that I want to keep set as stated
+data(iris) # load in data
+for(i in levels(iris$Species)){
+  n <- iris[iris$Species == i,]
+  print(mean(n$Petal.Length))
+}
+n # my constant global variable changed
+
+## Good apply function
+n <- 100 # constant global variable that I want to keep set as stated
+foo <- split(iris, f = iris$Species) # The split–apply–combine pattern
+lapply(foo, FUN = function(xx){      # The split–apply–combine pattern
+  n <- mean(xx$Petal.Length)
+})
+n # unaffected
+```
+
+*The above is a demonstration. DO NOT go out of your way to declare an internal variable that is irrelevant to the task at hand.*
+
+
+### apply()
+
+- works on a **A**rray X
+- MARGIN is the dimension in which the function is applied
+- FUN should be the function we want to apply to the array
+
+```
+apply(X, MARGIN, FUN, ...)
+```
+
+```{r} 
+apply(iris[,-5], 2, FUN = function(a){sum(a)/length(a)})
+```
+
+*Why can't we use *`apply(iris, 2, FUN = function(a){sum(a)/length(a)})`*?*
+
+
+### lapply()
+
+- works on a **L**ist X
+- returns a list of same length
+- FUN should be the function we want to apply to the list (element-wise)
+
+```
+lapply(X, FUN, ...)
+```
+
+```{r} 
+output.lapply <- lapply(1:6, FUN = function(i) print(1:i))
+```
+
+
+```{r} 
+y <- lapply(1:1e4, FUN = function(j){ 
+  if(!(j %% 2 == 0)) -j
+  else j
+})
+head(y)
+```
+
+### sapply()
+
+- works on a list X
+- returns a **S**implified object, either a vector or matrix (these are atomic structures)
+- FUN should be the function we want to apply to the list (element-wise)
+
+```
+sapply(X, FUN, ..., simplify = TRUE, USE.NAMES = TRUE)
+```
+
+```{r} 
+output.sapply <- sapply(1:6, FUN = function(i) print(1:i))
+```
+
+```{r} 
+x <- sapply(1:1e4, FUN = function(j){ 
+  if(!(j %% 2 == 0)) -j
+  else 2*j
+})
+head(x)
+```
+
+
+### Examples with the apply family of functions
+
+```{r}
+apply(cbind(1:11, 2:12, 3:13), 2, FUN = function(a){sum(a)/length(a)})
+```
+
+
+```{r} 
+y <- lapply(1:11, FUN = function(j){ 
+  if(!(j %% 2 == 0)) -j
+  else j
+})
+y
+```
+
+
+```{r} 
+x <- sapply(1:11, FUN = function(j){ 
+  if(!(j %% 2 == 0)) -j
+  else 2*j
+})
+x
+```
+

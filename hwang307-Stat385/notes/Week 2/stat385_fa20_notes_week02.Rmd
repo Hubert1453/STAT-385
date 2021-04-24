@@ -1,0 +1,457 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 2 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- More on how to use GitHub
+
+- GitHub troubleshooting 
+
+- **An Introduction to R** *Chapter 1 Introduction and preliminaries*
+
+- **An Introduction to R** *Chapter 2 Simple manipulations; numbers and vectors*
+
+
+***
+
+
+## More on how to use GitHub
+The following notes (below the double line) are directly from Prof. Daniel Eck's Terminal Tricks for using *Git from the command line*. When he mentions the terminal, he is referring to the shell. For different operating systems, the shell may be called the Terminal (Mac) or Git Bash (Windows), the RStudio's Terminal (any OS), etc. His course repo was called stat385resources; ours is course-materials. He uses a Mac; I use Windows.  
+
+***  
+***
+
+**Pro tip (folder name):** This document assumes that everyone has created a course folder. My course folder is called STAT385 and in this document it is saved on the Desktop of my Mac computer. You do not need to create another course folder if you already have one. You do not have to name your course folder STAT385 but you should NOT have any spaces in the name of this folder. The terminal may complain or not work properly if the name of your course folder contains spaces.
+
+**Pro tip (can use Rstudio terminal):** the tip is in parenthesis. I am writing this document assuming that everyone is working in a different terminal than the one that Rstudio provides. I am doing this this to emphasize that these tips are useful for general programming, not just programming through Rstudio.
+
+### Navigating directories using the terminal
+
+The first part of this document will teach you how to use the terminal to navigate directories for both Mac and Windows. I first provide instructions for Mac users, Windows users can skip ahead and refer to the Mac instructions for further guidance.
+
+
+#### For Mac
+
+For this first exercise, we are going to access a STAT385 folder that exists on the Desktop. Here are the steps:
+
+- open the Mac terminal and type **ls** to list the files that are in your current directory. This will give you a good idea of which directory you are in.  The first call of **ls** looks like this on my machine:
+
+![](https://uofi.box.com/shared/static/klm6aig160tq9hp05cl79iumhtrfnz7d.png)
+
+My terminal started in my user directory, as evidenced by calling the command **pwd**. We can see this on my machine:
+
+![](https://uofi.box.com/shared/static/j45ul6apfrkyphae2qos9438zkvt8ixe.png)
+
+- change directories to the STAT385 folder on my Desktop. My first call to **ls** showed that the Desktop is in my user directory and I know that the STAT385 directory is on the Desktop. I can access my STAT385 folder by using the **cd** command (**cd** is short for change directory). To illustrate, I'll first move the terminal to the Desktop by one call of the **cd** command. Here is what it looks like on my machine:
+
+![](https://uofi.box.com/shared/static/du4m109iymqiapkyxcz0s3rr015xyht3.png)
+
+- move to the STAT385 directory with another call to the **cd** command. Here is what it looks like on my machine:
+
+![](https://uofi.box.com/shared/static/wxp98fcbmi8t1dkua7rgxpumpbgvfyf4.png)
+
+- the previous calls of the **cd** mimics the behavior of clicking on folders to reach files in folders that were nested within the folder that was first clicked on. We can use the **cd** command to go backwards as well. A call of **cd..** will go backwards. Here it is on my machine:
+
+![](https://uofi.box.com/shared/static/mzbwryz5nhswkmi2v2i06ayxt4e5td3k.png)
+
+We can always return the User root directory by entering the command
+```
+cd ~/
+```
+
+This tutorial should help you navigate directories via the terminal. A slightly more advanced tutorial on the same stuff can be seen [here](https://www.macworld.com/article/2042378/master-the-command-line-navigating-files-and-folders.html).
+
+
+#### For Windows
+
+For this first exercise, we are going to access a STAT385 folder that exists on the Desktop. The steps for achieving this are similar to those provided for Mac users with minor changes in the name of some of the commands. The steps are:
+
+- open the Windows terminal and type **dir** to list the files that are in your current directory. This will give you a good idea of which directory you are in. My Mac terminal started in my user directory, as evidenced by calling the command **pwd** (do not do this on the Windows terminal, instead enter the command **echo %cd%**), yours may start out in the same place. 
+
+- change directories to the STAT385 folder on my Desktop. My first call to **dir** showed that the Desktop is in my user directory and I know that the STAT385 directory is on the Desktop. I can access my STAT385 folder by using the **cd** command (**cd** is short for change directory). To illustrate, I'll first move the terminal to the Desktop by one call of the **cd** command. Here is what it looks like:
+
+```
+cd Desktop
+```
+- move to the STAT385 directory with another call to the **cd** command. Here is what it looks like:
+
+```
+cd STAT385
+```
+
+- the previous calls of the **cd** mimics the behavior of clicking on folders to reach files in folders that were nested within the folder that was first clicked on. We can use the **cd** command to go backwards as well. A call of **cd ..** will go backwards. Try entering:
+
+```
+cd ..
+```
+
+We can always return the User root directory by entering the command
+```
+cd ~/
+```
+
+A more advanced tutorial on the same stuff can be seen [here](https://www.digitalcitizen.life/command-prompt-how-use-basic-commands).
+
+
+### Clone repos into your course folder
+
+**Pro tip (cloning repos):** Only clone your repo one time. Do not have multiples of the same repo on the same computer. Doing this will make your life more difficult than it needs to be. If you have multiples of the same repo on the same machine, then delete all but one of these repos.
+
+I now assume that everyone knows how to access their course folder using the terminal or the terminal that Rstudio provides.  We are now going to clone two repos into your course folder using GitHub. The instructions are similar to the instructions in your Week 2 notes. We will first clone MY **stat385resources** repo. This repo contains important course information and your homework files.
+
+Before we begin, make sure to locate and move your terminal to your course folder. For example, my course folder is called STAT385 and it is located on my Desktop. I followed the instructions in the previous Section to make the STAT385 folder my working directory (new term!). The following terminal command should clone my **stat385resources** repo into your course folder:
+
+```
+git clone https://github-dev.cs.illinois.edu/stat385-19/stat385resources.git
+```
+Feel free to change your working directory to the **stat385resources** via the **cd** command and then view its contents using the **ls** (Mac users) or **dir** (Windows users) commands.
+
+We will now clone your individual course repo into the course folder that exists on your desktop. **I am assuming that everyone has one**.
+
+**Pro tip (organization):** make sure that you set your course folder as the working directory just as you did before you cloned my  **stat385resources** repo into your course folder. Failure to do this may result in unnecessary headaches.
+
+Now that your working directory is your course folder, open your GitHub page in a web browser. Hit the `clone or download` button and copy the text that appears in the text box (it begins with https://). Here is what this looks like on my machine:
+
+![](https://uofi.box.com/shared/static/kz8inzy293q4y54p1mva0gbj4duegvlj.png)
+
+Now return to your terminal and type:
+
+```
+git clone PASTE THE LINK FROM THE pREVIOUS STEP
+```
+Here is what it looks like on my machine:
+
+![](https://uofi.box.com/shared/static/tekqfmg1o2yfj0y87p028sk3981jrd02.png)
+
+**Done for now**. If you got all of this done then you are in good shape. Keep the following in mind for now:
+
+![](https://uofi.box.com/shared/static/6hykltaff9v6dnjskxaxh3dwa91lzyai.jpg)
+
+
+### moving/copying files and folders across directories
+
+Now that you have your individual repo and my **stat385resources** repo cloned into your course folder we will discuss some terminal commands that are useful for copying and moving files and folders across directories. An example of this is to copy a homework .Rmd file that exists in a homework directory within my **stat385resources** repo to a homework directory that exists within your personal repo. You can click and drag or copy in paste using the graphical user interface of your computer, but the terminal is faster.
+
+In this tutorial I will go through how to copy your homework file from my **stat385resources** repo into a homework directory within your repo. I will explain these steps for both Mac and Windows users in the same Section. Before we begin, you should move your working directory to your course repo (mine is called dje13). Here are the steps:
+
+- make a directory called homework. This is accomplished by using the **mkdir** command as follows:
+
+```
+mkdir homework
+```
+
+- switch your working directory to the homework directory that you just created and then create a directory called HW1 by executing the command 
+
+```
+mkdir HW1
+```
+
+Now change directories to the HW1 directory that exists in my **stat385resources** repo.  This is achieved by going back two directories and then going forward three directories (one of which enters my repo, the other two are within my repo). A quick way to do this is by executing the command
+
+```
+cd ../../stat385resources/homework/HW1
+```
+
+The **../..** part of the above moved you backwards two directories. You are now in the HW1 directory within my **stat385resources** repo. You can then use **ls** to browse the contents of this directory. The file **HW1_Assignment.Rmd** (notice no spaces in the file name) is an R markdown file that contains the problems for your first homework assignment. You can copy this file to the HW1 directory that you created in your personal repo by using the **cp** command (Mac users) or the **copy** command (Windows users). Try it by executing
+
+```
+cp HW1_Assignment.Rmd ../../../YOURREPONAME/homework/HW1
+```
+
+or
+
+```
+copy HW1_Assignment.Rmd ../../../YOURREPONAME/homework/HW1
+```
+
+depending on which operating system you have. The logic of the above is 
+
+```
+cp [file name(s)] [path of directory that we want file(s) copied into]
+copy [file name(s)] [path of directory that we want file(s) copied into]
+```
+Now go to the HW1 directory that exists in your personal repo by executing the command
+
+```
+cd ../../../YOURREPONAME/homework/HW1
+```
+
+Hit **ls** (Mac users) or **dir** (Windows users) in this directory. Your first homework assignment should now appear in the HW1 directory within your personal repo.
+
+Mac users can replace the **cp** command with **mv** in order to move files from a directory to another directory. Windows users can replace the **copy** command with **move** in order to move files from a directory to another directory.   A more technical tutorial on the same stuff is provided [here](https://openclassrooms.com/en/courses/4614926-learn-the-command-line-in-terminal/4634381-move-and-copy-items-in-your-system), keep in mind that the commands used are for Mac users. A list of terminal commands for Windows users is [here](https://www.thomas-krenn.com/en/wiki/Cmd_commands_under_Windows). 
+
+
+### GitHub pulling and pushing using the terminal
+
+For what follows, I will assume that the terminal's current working directory is my **stat385resources** repo.  You can use the terminal to obtain changes that I made to files and folders in my repo. To do this, run the command
+
+```
+git pull
+```
+
+Now change the terminal's working directory to your personal repo. In what follows, I will assume that your local repo is ahead of your remote repo. We can use Rstudio to push our changes to our remote repo. However, we can also use the terminal to achieve the same result in three lines. We first add files and folders that have changed, we then add a commit message, and we finally push the changed files and folders. On the terminal, the commands are **git add**, **git commit**, and **git push**. An example is given as
+
+```
+git add name_of_file_that_was_changed.extension
+git commit -m 'enter commit message'
+git push
+```
+
+
+### GitHub access previous commits
+
+In this Section we will embrace some of the version control functionality by accessing files and folders from previous commits. In what follows, I will assume that your terminal's working directory is my **stat385resources**.  We first display the commit history in the **stat385resources** repo by entering the following command in your computer's terminal
+
+```
+git log
+```
+
+Here is what it looks like on my computer at the time that this document was written
+
+![](https://uofi.box.com/shared/static/3uy1lanc9va5mqw4a5diwsw29vwj4e13.png)
+
+From this `log` we can see that the second homework was added to my repo and then removed from my repo.  The yellow text in the above displays how GitHub encodes your commit history. We can see that the second homework was added to my repo with the commit `7897c7a3438a5b0dcc8299be48fcfc3d2610315b`
+Exit this `log` by typing `q`. **Be careful with what follows**. We will use **git checkout** to access the files from previous commits. For example, in order to access your homework type
+
+```
+git checkout 7897c7a3438a5b0dcc8299be48fcfc3d2610315b
+```
+
+Now your terminal is in the branch corresponding to previous commit indexed by `7897c7a3438a5b0dcc8299be48fcfc3d2610315b`. DO NOT PUSH CHANGES.  We can navigate the files and folders of this commit using the terminal. For example, we can view the second homework assignment by using terminal commands.
+
+```
+cd homework/HW2
+ls
+```
+
+We can now copy the second homework assignment to your STAT385 directory by typing
+
+```
+cp HW2* ../../../
+```
+
+Now your second homework assignment is saved outside of my **stat385resources** repo and we can leave the branch corresponding to the previous commit and return to the current branch.  First, change the terminal's working directory to my **stat385resources** repo
+
+```
+cd ../
+```
+
+We can view the GitHub branches by entering
+
+```
+git branch
+```
+
+Here is what it looks like on my computer
+
+![](https://uofi.box.com/shared/static/rrdka1c8qq7w8assznxbo2wp1wnv5npu.png)
+
+We are currently in the branch corresponding to the previous commit. Finally, we can return to the `master` branch which is up-to-date with your latest pull from my remote **stat385resources** repo. We do this with another call to git checkout
+
+```
+git checkout master
+```
+
+
+### GitHub branching
+
+I have created a new branch in my **stat385resources** repo. This branch will eventually contain your fourth homework assignment. If you have not already done so, pull changes from the **stat385resources** repo.
+
+```
+git pull
+```
+
+In the past we would call `git branch` to view the available branches. However, this does not work here, it will only display the branches that exist locally. The following call will display all branches that exist locally and remotely (these were previously hidden):
+
+```
+git branch -a
+```
+
+You can view the contents of the HW4 branch that exists remotely with the command:
+
+```
+git checkout origin/HW4
+```
+
+The above command will not create a local version of the HW4 branch. If you want to work on the HW4 branch, you'll need to create a local tracking branch which is done automatically by:
+
+```
+git checkout HW4
+```
+
+Now, if you look at your local branches with a call to `git branch`, you will see a local version of the HW4 branch.  Furthermore, the above function switches your GitHub pointer from the master branch to the HW4 branch, you are currently in the HW4 branch. You can pull changes from the HW4 branch after I push them. You can return to the master branch with:
+
+```
+git checkout master
+```
+
+For more details, [click here](https://stackoverflow.com/questions/67699/how-to-clone-all-remote-branches-in-git).
+
+
+***
+
+## GitHub troubleshooting 
+Please take time to follow the Issues in the course-materials repo at https://github-dev.cs.illinois.edu/stat385-fa20/course-materials/issues. You'll find that certain questions about GitHub trouble have already been asked and/or answered there. Also it's quite easy to do a Google search for the error message you're receiving. It's highly unlikely that you are the first person ever to encounter issues with Git. 
+
+Jennifer Bryan et al have organized some of the most common troubles with R, RStudio and Git. Please read their Chapter 14 https://happygitwithr.com/troubleshooting.html.
+
+
+***
+
+
+## **An Introduction to R** *Chapter 1 Introduction and preliminaries*
+
+### Computer Life-saving Tip: Learn how to find the file locations or pathnames for your files.
+
+### Git/GitHub Life-saving Tip: Each time you open a project or clone a repo, always pull first.
+
+Here are some basic R and RStudio things we should know.
+
+- **objects**: entities that R operate on. Some objects are data frame, vectors, lists, matrices, arrays, and functions. Usually objects need to be assigned using the **assignment** `<-` as in:
+```{r basics1}
+x <- 10
+x=10 #also works
+```
+
+- **workspace**: the collection of objects.
+
+- **removing objects**: since objects take up space in the form of memory, we may want to remove large objects. We remove objects using `rm` as in:
+```{r basics2}
+rm(x)
+```
+
+- **functions**: elegant objects that are made to simplify tasks that may usually take several lines of code to complete. R has several functions (see `mean`) already within it, but we could write our own functions (see `avg`):
+```{r basics3}
+mean
+avg <- function(a){sum(a)/length(a)}
+avg
+```
+
+- **help**: when we don't know what a function does, we can query R about it with the `help` function or use `?`:
+```{r basics4}
+help(mean)
+?mean
+```
+
+- **packages**: neat but often complex subsystems that are useful for doing more than what the base R system can do. We often need to install packages that are not in R by default in order to do cooler-ish things. If the package already existed in the R environment, then we can access it using:
+```{r basics5}
+library(MASS)
+```
+
+- **R as a calculator**: at its most basic level, R can handle several computations - from addition to exponentiation. R also honors order of operations.
+```{r basics6}
+5+5
+5*5
+5^5
+5 %% 5
+```
+
+- **probability distributions**: R has almost all of the typical probability distributions that you have seen in STAT 100, 200, or 400. Below we can create random realizations from a standard normal (Gaussian) distribution
+```{r basics7}
+x <- rnorm(20)
+y <- rnorm(20)
+```
+
+- **plots**: graphic displays. R has a basic but powerful graphical display. We will see how to get more complicated figures later in the semester.
+```{r basics8}
+plot(x,y,main="A Basic Scatter Plot")
+```
+
+
+***
+
+
+## **An Introduction to R** *Chapter 2 Simple manipulations; numbers and vectors*
+
+We have seen the **assignment** statement for creating objects. A vector is one of the simplest objects. We need the assignment `<-` and the function `c()` to create a vector. This is one standard.
+
+```{r simp1}
+x <- c(1,2,3,4,5,6)
+```
+
+Alternatively, we can create integer sequences which are also vectors.
+```{r}
+x2 <- 1:6
+```
+
+We can do arithmetic on that vector using R as a calculator. Notice that the arithmetic operators or functions operate on each element of the vector. This is a simple form of **vectorization**. We can do an operation on each element without having to explicitly tell R to do it that way (looping across each element). Vectorization will be done on more complex objects and with even more elegant functions.
+
+```{r simp2}
+x <- x + 10
+sum(x)
+sqrt(x) #vectorization
+```
+
+```{r simp3}
+#not vectorization
+sqroot<-NULL
+for (i in 1:length(x))
+  sqroot<-c(sqroot,sqrt(x[i]))
+sqroot
+```
+
+Vectors do not always have to be numeric. They could be logical with either TRUE (equals 1) or FALSE (equals 0) values. One way to generate logical values is through setting conditions.
+```{r simp4}
+1>0
+
+a <- c(5 == 5, 4 < 3)
+a
+
+a * 1 #arithmetic with logical vector
+```
+
+Vectors could also be made up of characters or strings.
+```{r simp5}
+letters #pre-defined in R
+LETTERS #pre-defined in R
+
+b <- c("happy people", "singing","and dancing")
+b
+
+c <- c("red", "white", "blue")
+c
+```
+
+Sometimes data may be missing `NA` or computationally undefined 'NaN'.
+```{r simp6}
+0/0
+d <- c(1,2,3,NA)
+d
+
+d+2
+```
+
+With these kinds of values in vectors we can create sequences `seq()` or repeating values with `rep()`. We could use the `paste` function for elegantly creating character sequences.
+```{r simp7}
+seq(from=1,to=10,by=1)
+1:10
+
+rep(1,10)
+
+paste("Student", 1:5, "Names")
+```
+
+We can subset objects and vectors in particular by using brackets `[]` to select particular elements. This is called **indexing**. 
+
+```{r simp8}
+x <- c(1,3,5,7,9,10)
+x[5]
+x[1:5]
+x[x>3]
+x[-3]
+letters[letters>"b"]
+```
+

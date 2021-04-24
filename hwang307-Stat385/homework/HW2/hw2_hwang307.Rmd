@@ -1,0 +1,124 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 2
+### Due: Monday September 21, 2020 11:59 pm US Central Time
+#### Created by Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+
+**Retrieving your work**
+
+This and all future homework files are written in RMarkdown (.Rmd). The .Rmd file will exist in the `homework` directory within the `course-materials` repo, i.e. `course-materials/homework` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of all course materials and files. After pulling the repo, the homework file will be in the homework directory. You must save the homework file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as hw#_netID.Rmd. For example, my homework 1 file would be saved as hw1_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as hw#_netID.html. For example, my homework 1 file would be saved as hw1_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. When students get stuck on a homework problem, students should ask the question in the Issues page in GitHub. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the provided URLs to access the datasets (if any). Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset` function is never allowed in this course.
+
+1. (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in bold text as the second item. 
+   1. Hubert
+   2. **Wang**
+
+2. (Syllabus, Markdown, Course announcements, Email) Who are the course assistants (CAs)? Write your answer as an unordered list with each CA's name in italic text.
+- *Yuriy Kotskyy*
+- *Michael Zhuang*
+- *Su Kim*
+
+3. (GitHub, Markdown) Pull requests are the erroneous result of files being changed in the local remote repo without first pulling the repo in GitHub. Is this true or false? Write your answer in bold text.
+
+**False**
+
+4. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions) Place two numeric vectors (named as `x1` and `x2`) into a single matrix named as `matrix1` such that both `x1` and`x2` have 30 elements each. `x1` contains a random sample (not from any statistical distribution) of 30 values between the numbers 1 and 30 such that no values appear more than once. `x2` contains a random sample (not from any statistical distribution) of 30 values between the numbers 1 and 15 such that some values appear more than once. Print the resulting `matrix1`. *There should be only 30 rows in `matrix1`.*
+
+```{r}
+x1 <- sample(1:30,30,replace=FALSE)
+x2 <- sample(1:15,30,replace=TRUE)
+matrix1 <- cbind(x1,x2)
+matrix1
+```
+
+5. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions) Beginning with the vectors `x1` and `x2` in **Problem 4**, convert `x2` into a character vector. Then, place `x1` and `x2` into a single matrix named as `matrix2`. Print the resulting `matrix2`. *There should be only 30 rows in `matrix2`.*
+
+```{r}
+x2 <- as.character(x2)
+matrix2 <- cbind(x1,x2)
+matrix2
+```
+
+6. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions, R Ordered and unordered factors) The resulting `matrix2` looks structurally different from `matrix1`. Explain in words why `matrix2` is the way that it is.
+
+Matrices are atomic objects, and the values contained in atomic objects are all of the same mode. You cannot mix different modes together, so the mode gets implicitly coerced. Because characters are higher on the hierarchy for coercion, all values in the matrix got coerced into characters. 
+
+7. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions, R Ordered and unordered factors) Beginning with the vectors `x1` and `x2` in **Problem 4**, create a new matrix named as `matrix3` that contains three columns `x1`, `x2`, and `x3`. The column `x3` is a factor vector named as `x3` that has 3 levels (1, 2, and 3 each appearing 10 times). Print the resulting `matrix3`. *There should be only 30 rows in `matrix3`.*
+
+```{r}
+x2 <- as.numeric(x2)
+x3 <- factor(rep(sample(1:3,3,replace=FALSE),10))
+matrix3 <- cbind(x1,x2,x3)
+matrix3
+```
+
+8. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions, R Ordered and unordered factors) Beginning with the vector `x3` in **Problem 6**, run the following commands in the R code chunk below and answer the questions:  
+
+- Why did the first line return a warning message, but the second and third lines did not return a warning message? 
+
+- Which of the three lines properly added 2 to the levels of the factor column `x3` returning 30 values and why? 
+
+*The eval=FALSE is here to prevent the problem from executing the coding chunk, but your answer should not contain eval=FALSE.*
+
+```{r, eval=TRUE}
+2 + x3
+2 + as.numeric(x3)
+2 + as.numeric(levels(x3))
+```
+
+ - The first line returned a warning message because the mode of x3 is a factor. The elements of a factor are always stored as characters, and non-numeric objects cannot be added to another object. The second and third lines did not return a warning message because the as.numeric function coerced x3 into becoming numeric. 
+   
+ - The second line properly added 2 to the levels of x3 returning 30 values because the second line added 2 to all 30 values in x3. The third line only added 2 to levels(x3), which returns a vector of all possible values of x3 and only returns 3 values.
+   
+9. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions) Create a matrix (named as `matrix4`) with three columns such that column 1 contains the first 10 letters of the alphabet in repeating sequence (i.e. a, a, b, b, ..., j, j) letters, column 2 contains 20 random continuous uniform distribution deviates (where U(0,20)) rounded to the tenths place, and column 3 contains a randomized ordering of the concatenated values of columns 1 and 2. *The concatenation should not have any spaces between the values of columns 1 and 2.* Print the resulting `matrix4`. *There should be only 20 rows in `matrix4`.*
+
+```{r}
+length(letters) <- 10
+col1 <- sort(rep(letters,2))
+col2 <- round(runif(20,0,20),1)
+col3 <- sample(paste(col1,col2,sep=""),20,replace=FALSE)
+matrix4 <- cbind(col1,col2,col3)
+matrix4
+```
+
+10. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, R Arrays and matrices, R Probability distributions) Let `matrix5` be equal to `matrix4` in **Problem 9**. Now, create a new `matrix5` that has its entire rows reordered such that the column 2 numeric values are in decreasing order. *Column 2 is determining the row order for the entire matrix; not just switching the order of column 2 alone.* Print the resulting `matrix5`. *There should be only 20 rows in `matrix5`.*
+
+```{r}
+matrix5 <- matrix4
+matrix5[order(as.numeric(matrix5[,2]),decreasing=TRUE),1:3]
+```

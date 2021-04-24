@@ -1,0 +1,385 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 1 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Introduce the course learning objectives
+
+- A reminder to read the syllabus
+
+- Discuss and demonstrate R, RStudio, RMarkdown, and Markdown
+
+- Discuss and demonstrate Git and GitHub
+
+
+***
+
+
+## Introduce the course learning objectives
+Here are the course learning objectives.
+
+- Students must *recall* important coding concepts and workflows.
+
+- Students must *construct* coding notebooks.
+
+- Students will *assess* visualizations for visual clarity.
+
+- Students must be able to *explain* and *summarize* coding, reproducible documentation, and textbooks/notes/readings.
+
+- Students will *reproduce* and *replicate* visualizations and programming.
+
+- Student groups will *design* their own investigations about real-world data. It will require posing problems, planning, working with data, analyzing, and concluding.
+
+- Students will *design* a Shiny App.
+
+- Students will *collaborate* on a Shiny App using Git.
+
+These objectives are important because they connect the physical know-how with the technical knowledge of the course.
+
+
+***
+
+## A reminder to read the syllabus
+![](https://vignette.wikia.nocookie.net/logosrupaulsdragrace/images/6/6e/The_library_is_open.gif)
+
+Please take time 15-30 minutes to read the syllabus on the course website https://github-dev.cs.illinois.edu/stat385-fa20/course-materials. Knowing what is to come and how will help you in the future. *Students will be assessed on the syllabus throughout the semester.* Please write any questions you have about the syllabus in the Issues page in GitHub. Below, we highlight some important items from the syllabus.
+
+
+***
+
+
+## Discuss and demonstrate R, RStudio, RMarkdown, and Markdown
+
+### R
+**R** is a statistical programming language widely popular to statisticians in research and academia. It is free, open-source, and is being developed by its users to handle tasks beyond statistics and data science. We can code in R - usually in a **script** - and saved as a .R file. The output of the code we run is visible in the **console**.
+
+- Click here to download [R](https://cran.r-project.org/)
+
+- This is what R looks like  ![](https://uofi.box.com/shared/static/9xqoyl8zlyin5qikzkrxjtsne39bney6.png)
+
+***If you haven't done so, be sure to install and/or update to the latest version of your R.***
+
+
+### RStudio
+**RStudio** is an interface for R that is relatively user-friendly, visually sufficient, and well-organized for content management. In RStudio, we could do almost everything we need for this course such as R calculations, install and update R packages, write **RMarkdown** (.Rmd) files and render or "knit" them .html, build websites and Shiny apps, etc.
+
+- Click here to download [RStudio](https://www.rstudio.com/products/rstudio/download/)
+
+- This is what RStudio looks like    ![](https://uofi.box.com/shared/static/37pi25uapt2fkzisflu2uqz76xyefuu0.png)
+
+
+### RMarkdown
+**RMarkdown** is a powerful package that allows us to create reproducible documents such that anyone on the planet (with similar programming acumen) can look at our .Rmd document and the code within it and re-create the same results. The other nice thing about reproducible documents is that we can have descriptions and directions written in narrative style along with code and results of that code. RMarkdown as a package comes pre-installed with RStudio but can be installed as a package in base R.
+
+RMarkdown documents are saved with the .Rmd file extension. This document that you are reading is an RMarkdown document, which as the name suggests is based on for Markdown syntax. 
+
+- For more details on using R Markdown see http://rmarkdown.rstudio.com.
+
+Thanks to RMarkdown, I can explicitly embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+Or I could make it implicit, i.e. invisible to the reader like this:
+
+```{r pressure, echo=FALSE}
+summary(cars)
+```
+
+
+### Markdown
+**Markdown** is a markup language with special syntax used to craft and design simple yet flexible text documents. Markdown permits users to author HTML, PDF, and MS Word documents. Latex can be included in Markdown syntax as well. Markdown was created by John Gruber in 2004 and has caught on in popularity. We use Markdown syntax within RMarkdown, JupyterLab, and Jupyter Notebooks.
+
+- Two nice references on Markdown syntax are https://www.markdownguide.org/basic-syntax/ and https://www.markdownguide.org/extended-syntax/. 
+
+Here are some frequent Markdown syntax examples:  
+
+  - **bold** text ( text enclosed with \*\* on both sides )
+  
+  - *italic* text ( text enclosed with \* on both sides )
+  
+  - lists (this is a list already) ( mark with \- )
+  
+  - tables ( pipes between columns and a new line with \-\-\-\|\-\-\- )
+  
+  Variable | Description
+  ---|---
+  Var1 | student ID
+  Var2 | height of students
+  
+  - hyperlinks for URLs ( paste the URL )
+  
+  https://www.markdownguide.org/
+  
+  - hyperlinks for URL images ( mark with \!\[\](pastedURL) )
+  
+  ![](https://uofi.box.com/shared/static/h59bqi70hgvwvqba8iy8mfsw0vyf56pr.png)
+
+### R, RStudio, and RMarkdown Examples
+Below is a short list of basic R and RStudio things we should familiarize ourselves with. The code chunks below are executable thanks to RMarkdown.
+
+- **objects**: entities that R operate on. Some objects are data frame, vectors, lists, matrices, arrays, and functions. Usually objects need to be assigned using the **assignment** `<-` as in:
+```{r basics1}
+x <- 10
+```
+
+- **workspace**: the collection of objects.
+
+- **removing objects**: since objects take up space in the form of memory, we may want to remove large objects at times. We remove objects using `rm` as in:
+```{r basics2}
+rm(x)
+```
+
+- **functions**: elegant objects that are made to simplify tasks that may usually take several lines of code to complete. R has several functions (see `mean`) already within it, but we could write our own functions (see `avg`):
+```{r basics3}
+mean
+avg <- function(a){sum(a)/length(a)}
+avg
+```
+
+- **help**: when we don't know what a function does, we can query R about it with the `help` function or use `?`:
+```{r basics4}
+help(mean)
+?mean
+```
+
+- **packages**: neat but often complex subsystems that are useful for doing more than what the base R system can do. We often need to install packages that are not in R by default in order to do cooler-ish things. If the package already existed in the R environment, then we can access it using:
+```{r basics5}
+library(MASS)
+```
+
+- **R as a calculator**: at its most basic level, R can handle several computations - from addition to exponentiation. R also honors order of operations.
+```{r basics6}
+5+5
+5*5
+5^5
+5 %% 5
+```
+
+- **probability distributions**: R has almost all of the typical probability distributions that you have seen in STAT 100, 200, or 400. Below we can create random realizations from a standard normal (Gaussian) distribution
+```{r basics7}
+x <- rnorm(20)
+y <- rnorm(20)
+```
+
+- **plots**: graphic displays. R has a basic but powerful graphical display. We will see how to get more complicated figures later in the semester.
+```{r basics8}
+plot(x,y,main="A Basic Scatter Plot")
+```
+
+
+***
+
+
+## Discuss and demonstrate Git and GitHub
+![](https://uofi.box.com/shared/static/eyd2qt5z9l98zzswut6eclkucv5x68z3.png)
+
+### Git
+As Jenny Bryan says in her book Git is a version control system. It smooths collaboration by allowing multiple users to work on the same document on their own devices all at the same time. Then those users can submit their updates, describe their updates, and no one needs to rename the file. That file is updated in Git with the same file name it began with. Even if you are working alone on a code file, using version control can help alleviate confusion about what you were doing last time on that file. Git is the software that allows us to connect to repos and collaborate on projects that may exist in GitHub.
+
+Here are some Git terms (in alphabetical order) we'll want to be familiar with.
+
+- **branches**: pathways of the repo. We can work on branches without affecting the master and this may be useful for experimenting with something without affecting the main project.
+
+- **cloning**: copying an existing repo 
+
+- **diff**: the set of differences between commits; observing diffs helps keep track of what has changed across two commits
+
+- **fetching**: downloading files from a remote that are not in your working directory
+
+- **history**: the tracking of all changes to a file
+
+- **master**: the main track of your repo. The master is also considered a branch. *GitHub may eventually replace the name "master" with a new name due to social justice advocates who oppose the oppressive history of the term "master"*
+
+- **merge conflict**: when two separate branches have made edits to the same line in a file, or when a file has been deleted in one branch but edited in the other. Merge conflicts can be fixed by manually editing the problem file and then merging and re-committing/pushing.
+
+- **merging**: combines updated information into one single file and puts that on the master. Merging may be used to resolve conflicts when collaborators commit changes on the same file.
+
+- **pulling**: a single command that does both fetching and merging
+
+- **pushing**: finalizing and formalizing an updated file by adding the changes from your local working directory to GitHub
+
+- **remote**: the cloned repo
+
+- **repo (or repository)**: the main folder or space in which a project exists
+
+- **staging (or the staging area)**: a file that stores information about what's being committed. We want to stage a file after we've updated it in some way so that it can be committed
+
+
+### GitHub (GitHub Enterprise)
+In this course we are using GitHub Enterprise which we call "GitHub" for simplicity. GitHub is the environment for all of the Git activities you might take part in using your browser. The course exists in GitHub at the website https://github-dev.cs.illinois.edu/stat385-fa20/course-materials. The course website landing page is the course Announcements. You should check the course website frequently for updates. You should always **pull** the course repo for updates to files and before beginning any assignment.
+
+In a lot of ways, we can use GitHub without using Git to do what we need in this course. The downside to doing this is that we miss out on the power of working remotely and being able to version the thing we are working on from our local machine.  Thus we opt for the usage of both since they complement each other.
+
+**Git can be used in three ways: from the command line (using the shell), with a Git client (such as GitHub Desktop or RStudio), or with GitHub.**
+
+Below I give instructions based on the command line approach to using Git. These are detailed steps for creating your individual student repo (the one names as your netID) and for establishing the connection between your computer (local machine) and your repo in GitHub. If you have already created your individual student repo, then you should skip step 1 below. The majority of these steps are discussed in the reference text **Happy Git and GitHub for the useR** by Bryan et al. https://happygitwithr.com/.
+
+#### Connecting your computer to your individual student repo in GitHub 
+0. Log into GitHub at https://github-dev.cs.illinois.edu/login with your netID and Illinois password. *If you've never used GitHub through the University before, logging in will establish your account.*
+
+1. Create your individual student **repositories** (names as your netID). 
+
+Repositories (**repos** for short) are essentially project folders where you intend to store a set of files that make sense being in the same location, much like a folder. Each student should click on this link https://edu.cs.illinois.edu/create-ghe-repo/stat385-fa20/ in order to create your student repo. In your personal repo is where you will keep your assignment files. The idea is that you will work on your assignments from your repo, updating it often to ensure you're working on the correct file(s).
+
+2. Now that we have our personal repos in GitHub, create a simple file called `README.md` that contains the quoted portion below:
+
+"My full name. This might be the first file I have ever created in GitHub." 
+
+3. Save the README.md file by writing a short message in the first text box under the "Commit Changes". Then click on "Commit changes".
+
+This short message that you write is called a **commit message** or **summary**. This action is called a **commit.** The commit is the message that you are leaving yourself to note what/why/how this file has been changed. Saving the file is technically called **pushing** although in GitHub the button is called "Commit changes".
+
+Your repo has a very special address which you need to **clone** onto your local computer. There's no reason to use GitHub to make and update files in the future if we have access to those same files on our local computer's directory. Cloning the repo connects your GitHub repo to your local computer as a folder (with the same name as the repo). After we access Git via a shell, we will clone our repos.
+
+4. Open your computer's shell called 'Terminal' (macOS/linux) or 'Git Bash' (Windows). This Terminal is a shell that allows us to access Git via the command-line. 
+
+5. Go to your repo in GitHub (your browser) and clone your repo by clicking the green "Clone or Download" button.
+
+6. Go to the shell and type (replacing 'YourNetID' with your actual netID):
+```
+git clone https://github-dev.cs.illinois.edu/stat385-fa20/YourNetID.git YourNetID
+```
+
+This is making the connection between GitHub and your computer (local machine).
+
+7. Using the shell, type and execute each line of code in the chunks below (steps 7.i to 7.iv)
+- 7.i Make your repo your current working directory  
+```
+cd YourNetID
+```
+
+- 7.ii List all files in your current working directory  
+```
+ls
+```
+
+- 7.iii Display the contents of the README.md file that you already created
+```
+head README.md
+```
+
+- 7.iv Get some information on its connection to GitHub
+```
+git remote show origin
+```
+
+These are simple commands that we use to work in Git. If done correctly, the message that appears after executing the `git remote show origin` line tells us that the connection to GitHub was successful.
+
+Cloning your repo should happen only once per computer (but we will repeat this in RStudio later in the notes). Meaning, we should never have to re-establish the connection to GitHub for this particular repo.
+
+8. Using the shell, edit the README.md file and verify Git status by typing and executing the lines of code in the chunk below.  
+```
+echo "The second thing I've written but now in Git from the command-line" >> README.md
+git status
+```
+
+9. Using the shell: stage the change (git add), commit it with a message (git commit), and push to GitHub repo (git push).
+```
+git add -A
+git commit -m "Added new sentence from local computer"
+git push 
+```
+
+10. Using GitHub, verify the new change by refreshing your individual student repo page at https://github-dev.cs.illinois.edu/stat385-fa20/YourNetID.
+
+***Congratulations! That's the first major step in collaborating with yourself in Git and GitHub!***
+
+If you've done this successfully on the first try, stand up and pat yourself on the back.
+
+If you didn't, it's okay. Try again skipping steps 0-1. 
+
+If you run into some technical difficulties, do check Chapters 14 of **Happy Git and GitHub for the useR** by Bryan et al. at this link https://happygitwithr.com/troubleshooting.html.
+
+
+***
+
+
+#### Connecting your computer to the STAT 385 course repo in GitHub (from the command line)
+Your individual student repo (the one named as your netID) is where you will submit (commit and push) your homework assignments (and exam) but that's not where you should retrieve the assignments. To retrieve the homework assignments, course notes, lecture videos, practice problems, exam, course Announcements, etc., you need to connect your local machine to the course repo; clone the course repo.
+
+1. Clone the `course-materials` repo in the course's GitHub page at https://github-dev.cs.illinois.edu/stat385-fa20/course-materials. 
+```
+git clone https://github-dev.cs.illinois.edu/stat385-fa20/course-materials.git stat385
+```
+
+2. Copy the files (such as stat385_fa20_homework01.Rmd) that you need to work with into your individual student repo (the one with your netID). *Here I just mean copy and paste the files; no special Git commands required.*
+
+3. Rename the file(s). For example, according to the homework file guidelines your homework 1 .Rmd file should be named as hw1_yourNetID.Rmd.
+
+4. Work on the homework on your local machine but in your remote (the one named as your netID); this remote is a local directory... so do save your work locally. Render (knit) it to hw1_yourNetID.html locally.
+
+5. When completely finished with the homework (or as often as you like), commit and push both files (such as hw1_yourNetID.Rmd and hw1_yourNetID.html) into your repo in GitHub. 
+
+Using the shell: stage the change (git add), commit it with a message (git commit), and push to GitHub repo (git push).
+```
+git add hw1_yourNetID.Rmd hw1_yourNetID.Rmd
+git commit -m "All done."
+git push 
+```
+
+***Voila!***
+
+That should have uploaded the assignment into your individual student repository in GitHub (refresh your GitHub page to verify). I advise students to commit and push your assignments often up to the deadline for the assignment is reached.
+
+
+***
+
+
+#### Using RStudio as a Git Client (optional)
+You may find it convenient (I surely do) to use RStudio as a Git Client since the bulk of the work we'll do in this course can be done in RStudio. Below are steps very similar to the tasks above in the ***Connecting your computer to your individual student repo in GitHub*** section. This time thought we are mostly using menus in RStudio and little to no interaction with the shell directly. Again, convenience is the coolest.
+
+1. Go to your individual student repo (the one named as your netID) in GitHub and click on the green "Clone or download" button.
+
+2. Open RStudio and click on "File", then "New Project", then "Version Control", then "Git."
+
+3. In the wizard: 
+- Paste your repo's address (copied from step 1 above) in the "Repository URL" field.  
+- Type yourNetID in the "Project Directory Name" field because that's the name of your repo.  
+- In the "Create project as sub-directory of" field, type or select the local file location where you want the remote to be .
+
+![](https://uofi.box.com/shared/static/m3xaqv2s30mckm5s3nxifd2qpir7o7ui.png)
+
+4. In RStudio, look in the Files pane (usually bottom right pane) and open the README.md file.
+
+5. In RStudio:
+- Edit the text in the README to be on new lines (if not already)
+- Add the sentence "The third thing was written using RStudio."
+- Save the README.md file
+
+6. Look in your Environment pane:
+- Click on Git
+- Click the "Staged" unchecked box to make sure the README.md file is highlighted and checked (there may be a lag time)
+- Click on "Commit"
+
+7. In the pop-up "Review Changes" window:
+- Write a short message about the change and click Commit
+- Click on Push
+- Close the pop-up window once it's finished
+
+***That's it! You've connected your repo again, but this time using RStudio.***
+
+If you were able to this successfully on the first try, then by golly, you're great at this!
+
+![](https://media.giphy.com/media/g1NwLDbHqlXlC/giphy.gif)
+
+If you didn't get it, stay encouraged and try again!
+
+If you run into some technical difficulties, do check Chapters 14 of **Happy Git and GitHub for the useR** by Bryan et al. at this link https://happygitwithr.com/troubleshooting.html.
+
+
+

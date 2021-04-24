@@ -1,0 +1,287 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 6
+### Due: Monday November 30, 2020 11:59 pm US Central Time
+#### Created by Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+
+**Retrieving your work**
+
+This and all future homework files are written in RMarkdown (.Rmd). The .Rmd file will exist in the `homework` directory within the `course-materials` repo, i.e. `course-materials/homework` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of all course materials and files. After pulling the repo, the homework file will be in the homework directory. You must save the homework file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as hw#_netID.Rmd. For example, my homework 1 file would be saved as hw1_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as hw#_netID.html. For example, my homework 1 file would be saved as hw1_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. When students get stuck on a homework problem, students should ask the question in the Issues page in GitHub. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the provided URLs to access the datasets (if any). Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset` function is never allowed in this course.
+
+**#1** (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in bold text as the second item. 
+
+   1. Hubert
+   2. **Wang**
+   
+**#2** (Prior knowledge, Data visualization, Visual design principles, Markdown) The data visualization in the image below suffers from poor design and interpretability. Using Markdown syntax, create an unordered list that contains two items about the image: one item should describe one flaw with the data visualization, while another item should describe what you would do to improve the data visualization.
+
+![](https://uofi.box.com/shared/static/u9bkhmv01glwu4e6qindsms3w9d8d9iv.jpg)
+
+- One flaw with the graph is the use of a secondary y-axis, which allows the graph to show two different data series that have completely different values. This makes the graph confusing and hard to read, so it's difficult for the audience to understand what the graph is trying to show.
+
+- There are some alternative ways to visualize the data in a less confusing way. You can create two side by side charts, and then use the same color for the rates and reserves of each element. You can also try to create a single plot that shows the relative percentage change in each data series. 
+
+**#3** (RMarkdown, R Objects, their modes, and attributes, R Lists and data frames, What is data, Importing data, Importing data with the tidyverse) Import the three data sets below using either base R or tidyverse functionality. It would behoove you to coerce the date (and time) columns in these 3 datasets to be appropriate date (and time) columns, i.e. numeric modes.
+
+- [University of Illinois SHIELD Testing Data](https://uofi.box.com/shared/static/omqfplpxi242g75u9idvufyuu5qdw2fu.csv) 
+
+- [Vote By Mail Data](https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv). 
+
+- [Historical Small Business Administration Data with Illinois Businesses](https://uofi.box.com/shared/static/8i0f47hz3fjs4e61fsfj3qix41hvtj92.csv)
+
+```{r}
+library(tidyverse)
+testing <- read_csv("https://uofi.box.com/shared/static/omqfplpxi242g75u9idvufyuu5qdw2fu.csv", 
+    col_types = cols(date = col_date(format = "%Y-%m-%d")))
+vote <- read_csv("https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv", 
+    col_types = cols(`Ballot Req Date` = col_date(format = "%m/%d/%Y"), 
+        `Ballot Sent Date` = col_date(format = "%m/%d/%Y"), 
+        `Ballot Received Date` = col_date(format = "%m/%d/%Y")))
+business <- read_csv("https://uofi.box.com/shared/static/8i0f47hz3fjs4e61fsfj3qix41hvtj92.csv", 
+    col_types = cols(ApprovalDate = col_date(format = "%m/%d/%Y"), 
+        DisbursementDate = col_date(format = "%m/%d/%Y"),
+        ChgOffDate = col_date(format = "%d-%b-%y")))
+```
+
+**#4** (RMarkdown, Data wrangling, Data visualization in base R, Visual design principles) Using the imported Historical Small Business Administration Data with Illinois Businesses, base R plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/9hvudx513r2ka63h5e9p1e4w8ll20yyb.png)
+
+```{r, eval=FALSE}
+table1 <- table(business$default_binary,business$recession_binary)
+percent <- apply(table1,2,function(x){x*100/sum(x)})
+par(xpd=TRUE,mar=c(10,15,4,4))
+barplot(percent,horiz=TRUE,col=c("#ef1e24","#1171bb"),axes=FALSE,las=1,col.axis="#808080")
+axis(side=1,at=seq(0,100,20),labels=c("0.00%","20.00%","40.00%","60.00%","80.00%","100.00%"),
+     tick=FALSE,col.axis="#808080")
+x <- 0
+for (i in 1:6){
+  lines(c(x,x),c(0.1,2.5),lwd=1,col="#A9A9A9")
+  x <- x+20
+}
+legend(35,-0.5,legend=levels(factor(business$default_binary)),
+       fill=c("#ef1e24","#1171bb"),horiz=TRUE,bty="n",text.col="#808080")
+```
+![](https://uofi.box.com/shared/static/4r1f1j4y8ps4uhu9zruoah6uvs6tkghu.png)
+
+**#5** (RMarkdown, Data wrangling, Data visualization in tidyverse, Visual design principles) Using the imported Historical Small Business Administration Data with Illinois Businesses, tidyverse plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/9hvudx513r2ka63h5e9p1e4w8ll20yyb.png)
+
+```{r,eval=FALSE}
+tibble1 <- tibble(default=business$default_binary,recession=business$recession_binary)
+tibble1 <- filter(tibble1,default!="NA"&recession!="NA")
+ggplot(data=tibble1, aes(fill=factor(default,c("Paid in Full","Default")),y=rep(1,nrow(tibble1)),x=recession)) + 
+  geom_hline(yintercept=seq(0,1,0.2),linetype=1,color="#A9A9A9") +
+  geom_bar(position="fill",stat="identity") +
+  coord_flip() + 
+  scale_fill_manual(values=c("#1171bb","#ef1e24")) +
+  theme(legend.position="bottom",
+        legend.title=element_blank(),
+        legend.key=element_rect(color="black",size=1),
+        axis.title=element_blank(),
+        axis.ticks=element_blank(),
+        panel.background=element_rect(fill="white"),
+        axis.text=element_text(size=13,color="#808080")) +
+  scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1),
+                     labels=c("0.00%","20.00%","40.00%","60.00%","80.00%","100.00%"))
+```
+![](https://uofi.box.com/shared/static/c9tond0ckmua7tzkjpeyzrlvorr5vubi.jpg)
+
+**#6** (RMarkdown, Data wrangling, Data visualization in base R, Visual design principles) Using the imported Champaign County Vote By Mail Data, base R plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/iofuld84rt3nl5ddaadqx0yocwy1ajqx.png)
+
+```{r, eval=FALSE}
+date <- seq.Date(sort(vote$`Ballot Req Date`,FALSE)[1],sort(vote$`Ballot Received Date`,TRUE)[1],"day")
+req <- NULL
+x <- 0
+for (i in date){
+  req <- c(req,x+nrow(vote[which(vote$`Ballot Req Date`==i),])-nrow(vote[which(vote$`Ballot Received Date`==i),]))
+  x <- x+nrow(vote[which(vote$`Ballot Req Date`==i),])-nrow(vote[which(vote$`Ballot Received Date`==i),])
+}
+plot(date,req,sub=title("Vote By Mail 2020",adj=0),
+     main=title("\n\n\n\nNumber of Requested Ballots Yet to Be Received in Champaign County",font.main=1,adj=0),
+     xlab="Date",ylab="",type="n",frame.plot=FALSE,axes=FALSE,ylim=c(0,30000))
+lines(date,req,lwd=2)
+lines(rep(as.Date("11-2-2020","%m-%d-%Y"),length(date)),req,col=rgb(232/255,74/255,39/255),lty=2)
+points(date[length(date)],tail(req,1),pch=16)
+points(date[which(req==max(req))],max(req),pch=16)
+text(date[length(date)],tail(req,1),tail(req,1),pos=2)
+text(date[which(req==max(req))],max(req),max(req),pos=3)
+axis(1,at=max(date),"Nov. 2, 2020",col.axis=rgb(232/255,74/255,39/255),tick=FALSE)
+```
+![](https://uofi.box.com/shared/static/1jjo4z97upmbyl0aqi33ju51i21s4b7c.png)
+
+**#7** (RMarkdown, Data wrangling, Data visualization in tidyverse, Visual design principles) Using the imported Champaign County Vote By Mail Data, tidyverse plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/iofuld84rt3nl5ddaadqx0yocwy1ajqx.png)
+
+```{r,eval=FALSE}
+tib <- tibble(Date=date,Req=req)
+ggplot(data=tib) +
+  geom_line(mapping=aes(x=Date,y=Req)) +
+  labs(title="Vote By Mail 2020",
+       subtitle="\n\nNumber of Requested Ballots Yet to Be Received in Champaign County",
+       x="Date",y="") +
+  theme(plot.title=element_text(face="bold")) +
+  annotate("text",x=max(tib$Date)-5,y=-1000,label="Nov. 2, 2020",colour=rgb(232/255,74/255,39/255)) +
+  geom_point(mapping=aes(x=date[which(req==max(req))],y=max(Req)))+
+  geom_point(mapping=aes(x=tail(Date,1),y=tail(Req,1)))+
+  geom_text(mapping=aes(x=date[which(req==max(req))],y=max(Req),label=max(Req)),nudge_y=750)+
+  geom_text(mapping=aes(x=tail(Date,1),y=tail(Req,1),label=tail(Req,1)),nudge_x=-7)+
+  theme(panel.background = element_rect(fill="white"),
+        axis.ticks=element_blank(),axis.text=element_blank())+
+  geom_vline(xintercept=lubridate::mdy("11/2/2020"),linetype=2,colour=rgb(232/255,74/255,39/255))
+```
+![](https://uofi.box.com/shared/static/djkui3dj6h21wc2dhfm5umwn1tg9ys8a.png)
+
+**#8** (RMarkdown, Data wrangling, Data visualization in base R, Visual design principles) Using the imported University of Illinois SHIELD Testing Data, base R plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/7d0aszmq3ac8p2xdvblmn2pjnd0vvln8.png)
+```{r,eval=FALSE}
+par(bg="#212629",fg="white",mar=c(6,5,7,15))
+barplot(testing$`New Cases`~testing$date,xlab="",ylab="",ylim=c(0,250),col="#1d57a4",xaxt="n",xaxt="n",
+        yaxt="n",border="#212629")
+abline(h=c(50,100,150,200,250),col="#505050")
+axis(side=2,col.axis="white",col="#212629",at=seq(50,250,50),labels=seq(50,250,50),las=2)
+par(new=TRUE)
+plot(testing$`Case Positivity %`~testing$date,
+     xaxt="n",yaxt="n",ylab="",xlab="",type="n",ylim=c(0,3),frame.plot=FALSE)
+lines(testing$`Case Positivity %`~testing$date,col="#f7821f",lwd=4)
+axis(side=4,col.axis="white",col="#212629",at=seq(0.5,3,0.5),labels=seq(0.5,3.0,0.5),las=2)
+text(x=par("usr")[2]+6,y=mean(par("usr")[3:4])+0.5,srt=270,adj=0,labels="Daily Case Positivity %",xpd=TRUE)
+text(x=mean(par("usr")[1:2]),y=par("usr")[3]-0.8,adj=0,labels="Date",xpd=TRUE)
+text(x=par("usr")[1]-6,y=mean(par("usr")[3:4])-0.5,srt=90,adj=0,labels="Daily New Cases",xpd=TRUE)
+legend(par("usr")[2]+5,y=mean(par("usr")[3:4])+0.1,c("New Cases","Case Positivity %"),
+       bty="n",xpd=TRUE,col=c("#1d57a4","#f7821f"),pch=c(15,15),pt.cex=c(2,1.5))
+axis(side=1,at=seq(as.Date("Mon Jul 6","%a %b %d"),as.Date("Mon Oct 26","%a %b %d"),7),
+     labels=format(seq(as.Date("Mon Jul 6","%a %b %d"),as.Date("Mon Oct 26","%a %b %d"),7),"%a %b %d"),
+     cex.axis=0.8,col="white",col.axis="white")
+text(x=par("usr")[1]-6,y=par("usr")[4]+0.8,"Unique New Cases",adj=0,col="white",cex=1.1,xpd=TRUE)
+text(x=par("usr")[1]-6,y=par("usr")[4]+0.45,
+     "Unique New Cases are the first time an individual is detected COVID-19 positive by the SHIELD saliva test",
+     adj=0,col="white",cex=1.1,xpd=TRUE,font=2)
+text(x=par("usr")[1]+2,y=par("usr")[3]-0.5,adj=0,labels="2020",xpd=TRUE,cex=0.9)
+```
+![](https://uofi.box.com/shared/static/twuuwcxa70xxcs3ajjhynkyoaeks1350.jpg)
+
+**#9** (RMarkdown, Data wrangling, Data visualization in tidyverse, Visual design principles) Using the imported University of Illinois SHIELD Testing Data, tidyverse plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/7d0aszmq3ac8p2xdvblmn2pjnd0vvln8.png)
+
+```{r,eval=FALSE}
+library(lubridate)
+ggplot(data=testing,aes(x=date,y=`New Cases`)) +
+  geom_hline(yintercept=seq(50,250,50),linetype=1,color="#505050") +
+  geom_bar(stat="identity",aes(fill="New Cases"),width=0.95) +
+  geom_line(mapping=aes(x=date,y=`Case Positivity %`*(250/3),color="Case Positivity %"),size=2) +
+  scale_color_manual(name=NULL,values=c("Case Positivity %"="#f7821f")) +
+  scale_fill_manual(name=NULL,values=c("New Cases"="#1d57a4")) +
+  guides(fill=guide_legend(order=1)) +
+  scale_y_continuous(breaks=seq(50,250,50),labels=seq(50,250,50),
+                     "Daily New Cases",
+                     sec.axis=sec_axis(~./(250/3),name="Daily Case Positivity %",
+                                       breaks=seq(0.5,3,0.5),labels=seq(0.5,3,0.5))) +
+  scale_x_continuous(breaks=seq(mdy("Jul 6 2020"),mdy("Oct 26 2020"),7),
+                     labels=c("Mon Jul 6\n2020        ",
+                              format(seq(mdy("Jul 13 2020"),mdy("Oct 26 2020"),7),"%a %b %d"))) +
+  labs(title="Unique New Cases",
+       subtitle="\nUnique New Cases are the first time an individual is detected COVID-19 positive by the SHIELD saliva test",
+       y="Daily New Cases",x="Date") +
+  theme(legend.position="right",
+        legend.title=element_blank(),
+        legend.background=element_blank(),
+        legend.text=element_text(color="white"),
+        legend.key=element_blank(),
+        panel.background=element_rect(fill="#212629"),
+        plot.background=element_rect(fill="#212629"),
+        panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.title.x=element_text(colour="white"),
+        axis.title.y=element_text(colour="white"),
+        axis.text.x=element_text(color="white"),
+        axis.text.y=element_text(color="white"),
+        plot.title=element_text(color="white",face="plain",size=12),
+        plot.subtitle=element_text(color="white",face="bold",size=12),
+        axis.line.x=element_line(size=0.5,color="white"),
+        axis.ticks.x=element_line(size=0.5,color="white"),
+        axis.ticks.y=element_line(color="#212629"))
+```
+![](https://uofi.box.com/shared/static/va1rj2extoptxlcf6yis82ezwrowqpo7.jpg)
+
+**#10** (RMarkdown, Data wrangling, Data visualization in base R and tidyverse, Visual design principles) The image below comes from C. Knaflic's Storytelling with Data `Let's Practice` Book. C. Knaflic believes the NPLs and Loan Loss Reserves data visualization in the bottom panel is an improvement on the original image in the top panel. The University of Illinois SHIELD Testing's data visualization (image provided in **Problem #8**) suffers from the same issues as the NPLs and Loan Loss Reserves data visualization (original image in the top panel). Beginning with the University of Illinois SHIELD Testing Data in **Problem #2**, use C. Knaflic's ideas in the improved image (bottom panel) and either base R or tidyverse plotting to make similar improvements to the University of Illinois SHIELD Testing's data visualization (image provided in **Problem #8**).
+
+![](https://uofi.box.com/shared/static/5m8noxz4pthhc21c7t5v8nq56jquuv1n.jpg)
+
+```{r,eval=FALSE}
+week_test <- summarise(group_by(testing,week = week(date)),value = sum(`New Cases`))
+library(lubridate)
+ggplot(data=week_test,aes(x=week,y=`value`)) +
+  geom_hline(yintercept=seq(100,900,100),linetype=1,color="#505050",size=0.5) +
+  geom_bar(stat="identity",aes(fill="Weekly New Cases"),width=0.9) +
+  scale_fill_manual(name=NULL,values=c("Weekly New Cases"="#1d57a4")) +
+  guides(fill=guide_legend(order=1)) +
+  scale_y_continuous(breaks=seq(100,900,100),labels=seq(100,900,100)) +
+  scale_x_discrete(breaks=seq(27,43,1),
+                   labels=c("Mon Jul 6 - Jul 12\n2020                   ",
+                            paste(format(seq(mdy("Jul 13 2020"),mdy("Oct 19 2020"),7),"%b %d"),
+                                  format(seq(mdy("Jul 19 2020"),mdy("Oct 25 2020"),7),"%b %d"),
+                                  sep=" - "),"Oct 26 - Oct 31")) +
+  labs(title="Weekly Unique New Cases",
+       subtitle="\nUnique New Cases are the first time an individual is detected COVID-19 positive by the SHIELD saliva test",
+       y="Number of Cases",x="Date") +
+  geom_text(aes(label=value,color="Col"),size=6,position=position_dodge(width=0.9),vjust=-1) +
+  scale_color_manual(values=c("Col"="white")) +
+  theme(legend.position="none",
+        panel.background=element_rect(fill="#212629"),
+        plot.background=element_rect(fill="#212629"),
+        panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.title.x=element_text(colour="white",size=14),
+        axis.title.y=element_text(colour="white",size=14),
+        axis.text.x=element_text(color="white",size=10),
+        axis.text.y=element_text(color="white",size=12),
+        plot.title=element_text(color="white",face="plain",size=16),
+        plot.subtitle=element_text(color="white",face="bold",size=16),
+        axis.line.x=element_line(size=0.8,color="white"),
+        axis.ticks.x=element_line(size=0.8,color="white"),
+        axis.ticks.y=element_line(color="#212629"))
+```
+![](https://uofi.box.com/shared/static/r7by3bwk5t7yprs8om0s2yd8v9pewy3j.jpg)

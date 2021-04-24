@@ -1,0 +1,182 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 4
+### Due: Monday October 19, 2020 11:59 pm US Central Time
+#### Created by Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+
+**Retrieving your work**
+
+This and all future homework files are written in RMarkdown (.Rmd). The .Rmd file will exist in the `homework` directory within the `course-materials` repo, i.e. `course-materials/homework` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of all course materials and files. After pulling the repo, the homework file will be in the homework directory. You must save the homework file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as hw#_netID.Rmd. For example, my homework 1 file would be saved as hw1_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as hw#_netID.html. For example, my homework 1 file would be saved as hw1_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. When students get stuck on a homework problem, students should ask the question in the Issues page in GitHub. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the provided URLs to access the datasets (if any). Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset` function is never allowed in this course. No tidyverse functionality is allowed on this assignment.
+
+1. (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in italic text as the second item. 
+
+   1. Hubert
+   2. *Wang*
+
+2. (Syllabus, Markdown) What is the maximum total number of points any student may receive at the completion of this course?
+
+244 points
+
+3. (Personal interest survey) What has been the most challenging aspect of the course so far?
+
+Focusing on work and dealing with distractions while working in a remote setting.
+
+4. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Lists and data frames, R Writing your own functions, R Grouping, loops, and conditional execution, Apply family of functions) Using RMarkdown, create one single custom function that converts measurements to units of volume including: cups, fluid ounces, milliliters, and liters. In particular, your measurements should be able to take as input two values: the number and the initial unit of measure. Your function should return the converted values in the other three units of volume (i.e. if the input is 2 cups, then your function returns X fluid ounces, Y milliliters, and Z liters). Convert the following:
+
+i. 10 cups
+
+ii. 13 fluid ounces
+
+```{r}
+conversion1 <- function(volume,unit){
+  if (unit == "cups"){
+    #I am using US cups and US fluid ounces for problem #4 and #5
+    c(paste(volume*8,"fluid ounces"),paste(volume*236.588,"milliliters"),paste(volume/4.227,"liters"))
+    } 
+  else if (unit == "milliliters"){
+    c(paste(volume/29.574,"fluid ounces"),paste(volume/236.588,"cups"),paste( volume/1000,"liters"))
+    }
+  else if (unit == "fluid ounces"){
+    c(paste(volume/8,"cups"),paste(volume*29.574,"milliliters"),paste(volume/33.814,"liters"))
+    }
+  else if (unit == "liters"){
+    c(paste(volume*33.814,"fluid ounces"),paste(volume*1000,"milliliters"),paste(volume*4.227,"cups"))
+    }
+}
+a <- 10
+b <- "cups"
+conversion1(a,b)
+c <- 13
+d <- "fluid ounces"
+conversion1(c,d)
+```
+
+5. (RMarkdown, R Simple manipulations, R Numbers and vectors, R Arrays and matrices, R Lists and data frames, R Writing your own functions, R Grouping, loops, and conditional execution, Apply family of functions) Using RMarkdown, create one single custom function that converts measurements to units of volume including: cups, fluid ounces, milliliters, and liters. In particular, your function should be able to take as input three values: the number, original volume unit, converted volume unit. Your function should return the converted value in a single phrase (i.e. if the input is 2, "cups", "fluid ounces" then your function returns the character string "2 cups equals X fluid ounces". Convert the following:
+
+i. 10 cups to milliliters
+
+ii. 13 liters to fluid ounces
+
+```{r}
+conversion2 <- function(volume,unit1,unit2){
+  vec1 <- c("cups","fluid ounces","milliliters","liters")
+  if (unit1 == "cups"){
+    vec2 <- c(NULL,volume*8,volume*236.588,volume/4.227)
+    } 
+  else if (unit1 == "milliliters"){
+    vec2 <- c(volume/236.588,volume/29.574,NULL,volume/1000)
+    }
+  else if (unit1 == "fluid ounces"){
+    vec2 <- c(volume/8,NULL,volume*29.574,volume/33.814)
+    }
+  else if (unit1 == "liters"){
+    vec2 <- c(volume*4.227,volume*33.814,volume*1000,NULL)}
+  paste(volume,unit1,"equals",vec2[which(vec1 == unit2)],unit2)
+}
+a <- 10
+b <- "cups"
+c <- "milliliters"
+conversion2(a,b,c)
+d <- 13
+e <- "liters"
+f <- "fluid ounces"
+conversion2(d,e,f)
+```
+
+6. (RMarkdown, R Objects, their modes, and attributes, R Lists and data frames, What is data, Importing data) Import the US State-level COVID-19 Historical Data from the New York Times and the Harvard's 2016 US Presidential Election by State Data using R and the data URLs [covid](https://uofi.box.com/shared/static/urzam55r2uyrzxwz34gf3i2jujviqbma.csv) and [election](https://uofi.box.com/shared/static/rsvhhskt1eb2q18od1wjscgs6646g93t.csv). 
+
+Now, print the structure (or mode of each variable) for each dataset. 
+
+- Data information: The **covid** dataset (a .csv file) contains the number of COVID-19 cases and deaths per state as a time series. The **election** data (a .csv file) contains how each state voted in the 2016 US Presidential Election and the number of votes each candidate received along with their political party affiliations. The candidate receiving the most votes can be considered as the winner of that state along with their political party. In other words, the state's political party affiliation is based on the candidate who who received the most votes for that state.
+
+```{r}
+covid <- read.csv("https://uofi.box.com/shared/static/urzam55r2uyrzxwz34gf3i2jujviqbma.csv")
+election <- read.csv("https://uofi.box.com/shared/static/rsvhhskt1eb2q18od1wjscgs6646g93t.csv")
+str(covid)
+str(election)
+```
+
+7. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with the **election** data in **Problem 6**, do the following:
+
+i. remove the columns that contain the year and version in the **election** data
+
+ii. rename the totalvotes variable as "quasi_pop"
+
+iii. print the first 10 rows of the **election** data.
+
+```{r}
+election <- election[,c(-1,-13)]
+names(election)[names(election) == "totalvotes"] <- "quasi_pop"
+head(election,10)
+```
+
+8. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Combine the imported **covid** data (**Problem 6**) with the modified **election** data (**Problem 7**) using an inner join such that there is only one candidate (the one who received the most votes) for each state and only states that are common to both datasets are stored in the combined data. 
+
+Now, print the first 10 observations of the combined data. *Hint: Keep in mind that this inner join will only make sense for the most recent date of COVID-19 data.*
+
+```{r}
+states <- unique(election$state)
+election_max <- NULL
+for(i in 1:length(states)){
+  maxvotes <- max(election[election$state==states[i],"candidatevotes"])
+  election_max <- rbind(election_max,election[election$candidatevotes==maxvotes,])
+}
+combine <- merge(election_max,covid[covid$date==range(covid$date)[2],],by="state")  
+head(combine,10)
+```
+
+9. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with the combined data in **Problem 8**, answer the following question: How many states who voted republican in the election are in the top 10 for the largest number of deaths from COVID-19 (at its most recent date)? *Your question should be answered in bold words in Markdown, and the resulting code and data print out should serve as evidence.*
+
+**5 states who voted republican in the electiom are in the top 10 for largest number of deaths from covid. Texas, Florida, Pennsylvania, Michigan, Georgia**
+```{r}
+combine_deaths <- combine[order(combine$deaths,decreasing=TRUE)[1:10],]
+combine_r <- combine_deaths[combine_deaths$party=="republican",]
+combine_r
+nrow(combine_r)
+```
+
+10. (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with the combined data in **Problem 8**, answer the following question: Does dividing the number of deaths by the "quasi_pop" alter which states are in the top 10 for the largest number of deaths from COVID-19 (at its most recent date)? *Your question should be answered in bold words in Markdown, and the resulting code and data print out should serve as evidence.* 
+
+**Yes, it would change the states that are in the top 10 for largest number of deaths from COVID**
+```{r}
+quasi_death <- combine$deaths/combine$quasi_pop
+combine_quasi <- combine
+combine_quasi$quasi_deaths <- quasi_death
+combine_quasi[order(combine_quasi$quasi_deaths,decreasing=TRUE)[1:10],]
+```

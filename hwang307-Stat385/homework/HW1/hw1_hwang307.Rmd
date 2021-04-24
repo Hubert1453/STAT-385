@@ -1,0 +1,213 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 1
+### Due: Monday September 7, 2020 11:59 pm US Central Time
+#### Created by Christopher Kinson
+
+Grading Rubric (per question):  
+2 points if complete and correct  
+1 point if incomplete or incorrect  
+0 points if no attempt made  
+
+
+**Retrieving your work**
+
+This and all future homework files are written in RMarkdown (.Rmd). The .Rmd file will exist in the `homework` directory within the `course-materials` repo, i.e. `course-materials/homework` in GitHub. You must **pull** the `course-materials` repo first to ensure that you have the most updated version of all course materials and files. After pulling the repo, the homework file will be in the homework directory. You must save the homework file into your individual GitHub repo (the one named as your netID). 
+
+**Submitting your work**
+
+In your individual repo (the one named as your netID), you are to submit ***two*** files:
+
+a. Your reproducible document file (.Rmd) which should be saved as hw#_netID.Rmd. For example, my homework 1 file would be saved as hw1_kinson2.Rmd.
+
+b. Your rendered reproducible document file (.html) which should be saved as hw#_netID.html. For example, my homework 1 file would be saved as hw1_kinson2.html.
+
+You have an unlimited number of submissions, but only the latest proper submission (commit and push) will be viewed and graded. Remember the .Rmd file needs to render properly to .html before submitting. 
+
+
+***
+
+
+*The following problems should be completed by you as an individual. If any problem asks you a particular question, be sure to answer it completely (with code, written sentences, or both). Written sentences should not appear in code chunks or code cells. Written sentences should appear in Markdown syntax unless specifically stated otherwise. When students get stuck on a homework problem, students should ask the question in the Issues page in GitHub. Do not change anything in this file above the double line.*
+
+
+***
+***
+
+
+### Use R for this entire homework assignment. Use the URLs to access the data. Functions or programming ideas outside of the topics/ideas covered thus far are not allowed. The `subset` function is never allowed in this course.
+
+1. (Markdown) Using Markdown syntax, make a numbered list with your first name in normal text as the first item and your last name in bold text as the second item. 
+
+    1. Hubert
+    2. **Wang**
+
+
+2. (Syllabus, Markdown) All assignments are assumed to be in which time zone? 
+
+US Central Time
+
+3. (GitHub, Markdown) Are merge conflicts able to be resolved? Write Yes or No in bold text.
+
+**Yes**
+
+4. (RMarkdown, R Simple manipulations, R Numbers and vectors) Using RMarkdown, determine if these numbers are prime or not:
+
+  a. 7919
+
+```{r}
+#A prime number is a number with only 2 factors, 1 and itself.
+#I use the seq function and the modulo operation to test if the given number has any other factors.
+#The modulo operator will return a value of 0 if it a factor. I then test all values in the sequence to see if they are equal to 0.
+#If it has a factor, the sum function will return a value greater than 0 and the number is not prime.
+#If it has no factor, the sum function will return a value of 0 and the number is prime.
+x <- 7919
+prime7919 <- 7919%%seq(2,x-1)
+sum(prime7919 == 0)
+#7919 has 0 factors.
+#7919 is a prime number.
+```
+
+  b. 111
+
+```{r}
+y <- 111
+prime111 <- 111%%seq(2,y-1)
+sum(prime111 == 0)
+3*37
+#111 has 2 factors
+#3 and 37 are factors of 111.
+#111 is not a prime number.
+```
+
+  c. 777
+
+```{r}
+z <- 777
+prime777 <- 777%%seq(2,z-1)
+sum(prime777 == 0)
+7*111
+#777 has 6 factors
+#7 and 111 are factors of 777.
+#777 is not a prime number.
+```
+
+5. (RMarkdown, R Simple manipulations, R Numbers and vectors) Using RMarkdown, calculate the following:
+
+  a. 6 ÷2(1 + 2)
+
+```{r}
+6/2*(1+2)
+```
+
+  b. 9 - 3 ÷ 1/3 + 1
+
+```{r}
+9-(3/(1/3))+1
+```
+
+  c. -10 ÷ (20 ÷ 2² × 5 ÷ 5) × 8 - 2
+
+```{r}
+(-10/(20/(2^2)*(5/5))*8)-2
+```
+
+6. (RMarkdown, R Simple manipulations, R Numbers and vectors) Using RMarkdown, reproduce the result.
+``` 
+"happy 1"  "happy 2"  "happy 3"  "happy 4"  "happy 5" 
+"happy 6"  "happy 7"  "happy 8"  "happy 9"  "happy 10"
+"happy 1"  "happy 2"  "happy 3"  "happy 4"  "happy 5" 
+"happy 6"  "happy 7"  "happy 8"  "happy 9"  "happy 10"
+```
+
+```{r}
+c(paste("happy",1:10),paste("happy",1:10))
+```
+
+7. (RMarkdown, R Simple manipulations, R Numbers and vectors) Create a vector of length 15 that contains the number 9 in the ninth place and zeroes otherwise.
+
+```{r}
+c(rep(0,8),9,rep(0,6))
+```
+
+8. (RMarkdown, R Numbers and vectors) Using RMarkdown and the vector `X` with the code `set.seed(385); X <- rnorm(10)` compute the following statistics for `X` by only using computations (no functions) and the formulas as a guide:  
+
+  a. mean $\bar{x}=\sum_{i=1}^{N} x_i/N$   
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+x_sum <- 0.88745254+1.13788102-0.38303588-0.60017263-0.79764060-0.61346699+0.77728575-0.03958418+0.44064853+0.75416090
+x_mean <- x_sum/10
+x_mean
+```
+
+  b. squared deviations from the mean $(x_i-\bar{x})^2$ 
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+x_sum <- 0.88745254+1.13788102-0.38303588-0.60017263-0.79764060-0.61346699+0.77728575-0.03958418+0.44064853+0.75416090
+x_mean <- x_sum/10
+x_mean
+x_dev <- (x-x_mean)^2
+x_dev
+```
+
+  c. sum of squared deviations from the mean $\sum_{i=1}^{N}(x_i-\bar{x})^2$ 
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+x_sum <- 0.88745254+1.13788102-0.38303588-0.60017263-0.79764060-0.61346699+0.77728575-0.03958418+0.44064853+0.75416090
+x_mean <- x_sum/10
+x_mean
+x_dev <- (x-x_mean)^2
+x_dev
+x_dev_sum <- 0.53450677+0.96339756+0.29094020+0.57233080+0.91010349+0.59262259+0.38555767+0.03839132+0.08082404+0.35737447
+x_dev_sum
+```
+
+9. (RMarkdown, R Numbers and vectors) Using RMarkdown and the vector `X` with the code `set.seed(385); X <- rnorm(10)` compute the following statistics for `X` using any of the functions `length()`, `mean()`, and `sum()` and the formulas as a guide:  
+
+  a. mean $\bar{x}=\sum_{i=1}^{N} x_i/N$   
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+mean(x)
+```
+
+  b. squared deviations from the mean $(x_i-\bar{x})^2$ 
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+mean(x)
+(x-mean(x))^2
+```
+
+  c. sum of squared deviations from the mean $\sum_{i=1}^{N}(x_i-\bar{x})^2$   
+
+```{r}
+set.seed(385)
+x <- rnorm(10)
+x
+mean(x)
+(x-mean(x))^2
+sum((x-mean(x))^2)
+```
+
+10. (GitHub) When you have completed all questions above, make a **commit** with the message "All done". After the commit is successful, **push** the completed file to your personal repo.

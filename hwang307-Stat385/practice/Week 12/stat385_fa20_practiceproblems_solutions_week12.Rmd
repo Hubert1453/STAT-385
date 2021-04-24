@@ -1,0 +1,104 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 12 Practice Problems Solutions
+### Created by Prof. Christopher Kinson
+
+**#1** (RMarkdown, R Objects, their modes, and attributes, R Lists and data frames, What is data, Importing data, Importing data with the tidyverse) Import the data set below using either base R or tidyverse functionality. 
+
+- [Vote By Mail Data](https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv). 
+
+```{r}
+library(tidyverse)
+vote <- read_csv("https://uofi.box.com/shared/static/dty5bxsi8pa4dfgly7ap9jtcp1806imy.csv", 
+                                                   col_types = cols(`Ballot Req Date` = col_date(format = "%m/%d/%Y"), 
+                                                                    `Ballot Sent Date` = col_date(format = "%m/%d/%Y"), 
+                                                                    `Ballot Received Date` = col_date(format = "%m/%d/%Y")))
+```
+
+
+**#2** Using the imported Champaign County Vote By Mail Data, base R plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/qw1s77n16kohft9fmg9m8jq4guekuj8z.png)
+
+This code chunk contains the data wrangling steps needed for Problems 2 and 3.
+```{r}
+x <- vote %>%
+  group_by(`Ballot Req Date`) %>%
+  summarise(ballot_req_date_freqs=n()) %>%
+  mutate(cumu_ballot_req_date_freqs=cumsum(ballot_req_date_freqs))
+
+xx <- vote %>%
+  group_by(`Ballot Received Date`) %>%
+  summarise(ballot_rec_date_freqs=n()) %>%
+  mutate(cumu_ballot_rec_date_freqs=cumsum(ballot_rec_date_freqs))
+
+zerodates<-x %>%
+  filter(`Ballot Req Date`<"2020-09-24") %>%
+  mutate(ballot_rec_date_freqs=0, cumu_ballot_rec_date_freqs=0) %>%
+  rename(`Ballot Received Date`=`Ballot Req Date`)
+
+xx2<- rbind(zerodates[c(1,4,5)],xx)
+
+#checking to see which dates are not the same in both datasets
+x$`Ballot Req Date`[121:150]
+xx2$`Ballot Received Date`[121:150]
+
+#Sep 26, 27, Oct 3, 10,11 these dates need to be imputed
+y<-tibble(`Ballot Received Date`=lubridate::mdy(c("09-26-2020","09-27-2020","10-03-2020","10-10-2020","10-11-2020")),ballot_rec_date_freqs=rep(0,5),cumu_ballot_rec_date_freqs=rep(0,5))
+
+xx3 <- rbind(xx2,y)
+xx4<- xx3 %>%
+  arrange(`Ballot Received Date`) %>%
+  mutate(cumu_ballot_rec_date_freqs=cumsum(ballot_rec_date_freqs))
+
+gap1=x$cumu_ballot_req_date_freqs-xx4$cumu_ballot_rec_date_freqs
+
+xx4 <- mutate(xx4, gap1=gap1)
+```
+
+This chunk contains the plotting steps to re-create the data visualization in base R.
+```{r}
+plot(xx4$`Ballot Received Date`,
+     gap1, 
+     type="l", lwd=2, ylab="", xlab="Date", main=title("Vote By Mail 2020\nNumber of Requested Ballots Yet to Be Received in Champaign County", adj=0),
+     frame.plot = FALSE, axes=FALSE, ylim = c(0,30000))
+points(min(xx4$`Ballot Received Date`,na.rm = TRUE),gap1[1], pch=19)
+points(max(xx4$`Ballot Received Date`,na.rm = TRUE),gap1[length(gap1)-1], pch=19)
+points(xx4$`Ballot Received Date`[which(gap1==max(gap1, na.rm = TRUE))],max(gap1, na.rm = TRUE), pch=19)
+text(min(xx4$`Ballot Received Date`,na.rm = TRUE)+2.5,gap1[1]+1000, gap1[1])
+text(xx4$`Ballot Received Date`[which(gap1==max(gap1, na.rm = TRUE))],max(gap1, na.rm = TRUE)+1000,max(gap1, na.rm = TRUE))
+text(max(xx4$`Ballot Received Date`,na.rm = TRUE)-6,gap1[length(gap1)-1],gap1[length(gap1)-1])
+abline(v=max(xx4$`Ballot Received Date`,na.rm = TRUE)+1, col=rgb(232/255,74/255,39/255), lty=2)
+axis(side=1, at=max(xx4$`Ballot Received Date`,na.rm = TRUE)+1, labels="Nov. 2, 2020", tick=FALSE, col.axis=rgb(232/255,74/255,39/255) )
+abline(v=min(xx4$`Ballot Received Date`,na.rm = TRUE), lty=2)
+axis(side=1, at=min(xx4$`Ballot Received Date`,na.rm = TRUE), labels="Apr. 21, 2020", tick=FALSE)
+```
+
+
+**#3** Using the imported Champaign County Vote By Mail Data, tidyverse plotting, and the image below as a guide, re-create the data visualization as closely as possible. *Your percentages will differ from the image below.*
+
+![](https://uofi.box.com/shared/static/qw1s77n16kohft9fmg9m8jq4guekuj8z.png)
+
+```{r}
+ggplot(data = xx4, mapping = aes(x=`Ballot Received Date`, y=gap1)) +
+  geom_line(size=1.05) +
+  labs(x= "Date", y="", title = "Vote By Mail 2020\nNumber of Requested Ballots Yet to Be Received in Champaign County") +
+  annotate("text",  x=c(min(xx4$`Ballot Received Date`,na.rm = TRUE)+5,max(xx4$`Ballot Received Date`,na.rm = TRUE)-4),y=c(2000,2000), label =c("Apr. 24, 2020", "Nov. 2, 2020"), colour=c("black",rgb(232/255,74/255,39/255))) +
+  theme(panel.background = element_blank(), axis.ticks=element_blank(), axis.text = element_blank()) +
+  geom_point(aes(x=min(`Ballot Received Date`,na.rm = TRUE),y=gap1[1]), size=2) + 
+  geom_point(aes(x=`Ballot Received Date`[which(gap1==max(gap1, na.rm = TRUE))],y=max(gap1, na.rm = TRUE)), size=2) +
+  geom_point(aes(x=max(`Ballot Received Date`,na.rm = TRUE),y=gap1[length(gap1)-1]), size=2) +
+  geom_text(aes(x=min(`Ballot Received Date`,na.rm = TRUE),y=gap1[1], label=gap1[1]), nudge_x = 2.5,nudge_y = 1000) +
+  geom_text(aes(x=`Ballot Received Date`[which(gap1==max(gap1, na.rm = TRUE))],y=max(gap1, na.rm = TRUE), label=max(gap1, na.rm = TRUE)), nudge_x = 0,nudge_y = 1000) +
+  geom_text(aes(x=max(`Ballot Received Date`,na.rm = TRUE),y=gap1[length(gap1)-1], label=gap1[length(gap1)-1]), nudge_x = -6,nudge_y = 0) +
+  geom_vline(xintercept = min(xx4$`Ballot Received Date`,na.rm = TRUE), linetype="dashed", colour="black") +
+  geom_vline(xintercept = max(xx4$`Ballot Received Date`,na.rm = TRUE)+1, linetype="dashed", colour=rgb(232/255,74/255,39/255)) 
+```
+

@@ -1,0 +1,25 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Week 5 Practice Problems
+### Created by Christopher Kinson
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**#1** (RMarkdown, Markdown, R Lists and data frames, Tibbles) Is the following a list, data frame, or tibble? Write your answer in bold text. *There can be more than one answer.*
+
+![](https://uofi.box.com/shared/static/ved8o4oej0qndauz8zk5m9cneldprh2m.png)
+**Data Frame, List **
+
+**#2** (RMarkdown, Markdown, R Lists and data frames, Tibbles) Is the following a list, data frame, or tibble? Write your answer in bold text. *There can be more than one answer.*
+
+![](https://uofi.box.com/shared/static/9m2ft2iu6guuab8zy796g1d0e7in0d55.png)
+**List**
+
+**#3** (RMarkdown, Markdown, R Lists and data frames, Tibbles) Is the following a list, data frame, or tibble? Write your answer in bold text. *There can be more than one answer.*
+
+![](https://uofi.box.com/shared/static/kphq00qkiv4qoyw9x20z12mwg5p0j5s2.png)
+**Tibble, Data Frame, List**

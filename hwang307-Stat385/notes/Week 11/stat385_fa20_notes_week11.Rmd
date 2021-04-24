@@ -1,0 +1,96 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 11 Notes
+### Created by Prof. Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Regular expression and string manipulation
+
+
+***
+
+
+## Regular expression and string manipulation
+In this section, we discuss typical subsetting with characters and strings. Character strings can be quite difficult to wrangle. This difficulty may be due to character encoding and differences in how computers interpret strings. One alleviation of this difficulty was conceptualized in the 1950s by Stephen Kleene called regular expressions (or regex for short). A regular expression is a standardized pattern for finding strings and characters. Regex exists separate from programming languages (much like SQL) and is incorporated via library or module into the programming language. 
+
+Regex can be used to pick out or match certain characters in a character vector, and this is helpful for subsetting strings. Regex can be used in R within the `tidyverse` package thanks to the `stringr` package. Read more here [R for Data Science - Strings](https://r4ds.had.co.nz/strings.html) and [Tidyverse's stringr](https://stringr.tidyverse.org/). Below is a table containing common regex syntax for finding characters and strings. The table's example is the following sentence: 
+
+    "Friends of the Geese are hosting a memorial service Saturday for the 175 geese killed this week by the Urbana Park District in its 'charity harvest.'"
+
+Regex Syntax | Explanation | Matching String Found
+---|---|---|
+\\w |any letter or digit | "FriendsoftheGeesearehostingamemorialserviceSaturdayforthe175geesekilledthisweekbytheUrbanaParkDistrictinitscharityharvest"
+\\d | any digit | "175"
+[\\.\\'] | only the period and apostrophe | "'.'"
+[^\\.] | anything but not the period | "Friends of the Geese are hosting a memorial service Saturday for the 175 geese killed this week by the Urbana Park District in its 'charity harvest'"
+[A-M] | anything with capital letters A-M| "FriendsGeeseDistrict"
+s+ | any words or characters with the letter s and anything after the s| "FriendsGeesehostingservicegeesethisDistrictitsharvest"
+s+\|S+ | any words or characters with the letter s or capital S and anything after the s or capital S | "FriendsGeesehostingserviceSaturdaygeesethisDistrictitsharvest"
+e{2} | any word with exactly two consecutive letter e| "Geesegeeseweek"
+
+See https://www.rexegg.com/regex-quickstart.html for more regex syntax capabilities.
+
+Below is an R code chunk as evidence of the regex usage along with some `stringr` package functions. These stringr functions are vectorized and return a value for each element in the input vector:
+
+- `str_extract`: extracts the matched pattern
+
+- `str_extract_all`: extracts multiple matched patterns (returns either a list `simplify=TRUE` or a matrix `siplify=FALSE`)
+
+- `str_remove`: removes the matched pattern
+
+- `str_remove_all`: removes multiple matched patterns
+
+- `str_replace`: replaces the matched pattern with another string
+
+- `str_replace_all`: replaces multiple matched patterns with another string
+
+- `str_count`: counts the number of times the pattern is matched
+
+**Notice that we need to use not one escape character `\`, but two `\\` to access special regex characters or explicit punctuation.**
+```{r}
+library(tidyverse)
+ss <- "Friends of the Geese are hosting a memorial service Saturday for the 175 geese killed this week by the Urbana Park District in its 'charity harvest.'"
+str_extract(ss, "\\w")
+str_extract_all(ss, "\\w")
+str_extract_all(ss, "[^\\.]")
+str_remove(ss, "\\.\\'")
+str_remove(ss, "\\d")
+str_remove_all(ss, "\\d")
+str_remove(ss, "[A-M]")
+str_remove_all(ss, "[A-M]")
+str_replace(ss, "s+|S+", "Que")
+str_replace_all(ss, "s+|S+", "Que")
+str_count(ss, "e{2}")
+```
+
+See https://www.rexegg.com/ (especially their Quick-Start https://www.rexegg.com/regex-quickstart.html) for more information on regular expressions in general. And do read the documentation for each of the above stringr functions, because they have some additional arguments that may be helpful. Ultimately, any regex used from this point in the semester is fair game for students (and for me). Please do take time out to try out the different examples at https://www.rexegg.com/ on your own.
+
+
+### Try It Out!
+After reading the notes and some additional examples at  https://www.rexegg.com/, students should be able to attempt these problems. 
+
+- Using the sentence about the geese above, do the following in a programming language:
+
+  - Find the number of times the letter "s" appears  
+  
+  - Count the number of times a word begins with the letter "t" 
+  - Find the number of times any digit between 1-9 appears
+  
+  - Count the number of words that contain the letter "g"
+  
+  - Which words have consecutive characters appearing twice?
+
+  - Show only the words excluding punctuation such that each word appears in its own vector.
+
+

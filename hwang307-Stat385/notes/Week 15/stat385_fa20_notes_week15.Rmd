@@ -1,0 +1,560 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Week 15 Notes
+### Created by Christopher Kinson
+
+
+***
+
+
+## Things Covered in this Week's Notes
+
+- Shiny app development Part 2
+
+
+***
+
+
+## We're still building Shiny apps!!!
+
+Execute the chunks within this Rmd file on your local computer to see and interact with the Shiny app.
+
+```{r, eval=FALSE}
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+  
+    # Sidebar with a slider input for number of bins 
+      sliderInput(inputId = "bins",
+                        label = "Number of bins:",
+                        min = 1,
+                        max = 50,
+                        value = 30), #the comma is important
+      
+    # Show a plot of the generated distribution
+      plotOutput("distPlot")
+      )
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$distPlot <- renderPlot({
+        # generate bins based on input$bins from ui.R
+        x    <- faithful[, 2]
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+        # draw the histogram with the specified number of bins
+        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+
+```
+
+
+## Now, we share solutions to the Task to Do (at bottom of) Week 13 Notes
+
+Here are more examples of Shiny apps:  
+- https://shiny.rstudio.com/gallery/kmeans-example.html  
+- https://shiny.rstudio.com/gallery/faithful.html  
+- https://shiny.rstudio.com/gallery/movie-explorer.html  
+
+
+### 1. Using Shiny, make a histogram with the `faithful` data (one of R's internal datasets). Allow the user to change the number of observations for the waiting column.
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "dat",
+              label = "Number of observations:",
+              min = 1,
+              max = nrow(faithful),
+              value = 10), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "distPlot")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$distPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- faithful[1:input$dat, 2]
+    #bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    # draw the histogram with the specified number of bins
+    hist(x, col = 'darkgray', border = 'white', main="Histogram of Old Faithful Waiting Times until Next Eruption")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+
+### 2. Using Shiny, make a histogram with the `faithful` data (which is already inside of R). Allow the user to change the number of observations for the eruptions column.
+
+```{r}
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "dat",
+              label = "Number of observations:",
+              min = 1,
+              max = nrow(faithful),
+              value = 10), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "distPlot")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$distPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- faithful[1:input$dat, 1]
+    #bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    # draw the histogram with the specified number of bins
+    hist(x, col = 'darkgray', border = 'white', main="Histogram of Old Faithful Eruption Times")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+
+### 3. Using Shiny, make a scatter plot with the `faithful` data (which is already inside of R). Allow the user to change the number of observations for both x (eruptions) and y (waiting) variables.
+
+```{r}
+#NOT SO NICE!
+
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "datx",
+              label = "Observations for Eruption times:",
+              min = 1,
+              max = nrow(faithful),
+              value = 10), #the comma is important
+  
+  sliderInput(inputId = "daty",
+              label = "Observations for Waiting times until next eruption:",
+              min = 1,
+              max = nrow(faithful),
+              value = 10), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "scatPlot")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$scatPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- faithful[1:input$datx, 1]
+    y    <- faithful[1:input$daty, 2]
+    
+    # draw the scatter plot
+    plot(x, y, col = 'darkgray', xlab="eruption time in minutes", ylab="waiting time in minutes", pch=16, main="Old Faithful Geyser Data")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 800))
+```
+
+Below is a nicer Shiny app.
+```{r}
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "datx",
+              label = "Number of observations:",
+              min = 1,
+              max = nrow(faithful),
+              value = 10), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "scatPlot")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$scatPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- faithful[1:input$datx, 1]
+    y    <- faithful[1:input$datx, 2]
+    
+    # draw the scatter plot
+    plot(x, y, col = 'darkgray', xlab="eruption time in minutes", ylab="waiting time in minutes", pch=16, main="Old Faithful Geyser Data")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+
+***
+
+
+## Please watch Parts 1-3 of the [Shiny app tutorial](https://shiny.rstudio.com/tutorial/) by RStudio to learn more on your own. 
+
+The following notes are from Grolemund's video and slides https://github.com/rstudio-education/shiny.rstudio.com-tutorial.
+
+
+***
+
+
+### We introduced Reactivity in the Week 13 Notes
+
+When a user changes an input value in the app and the app output changes as a result, that is called **reactivity**.
+
+If we want the **output** (histogram in the above app) to change after the user changes the **input** (slider in the above app), then we need to use the `input$`* matching the Id of the input in the ui and that input must go inside the `render*()` function. *If we do this correctly, then the reactivity occurs automatically!*
+
+**Reactive values** (i.e. the `input$`) work together with **reactive functions.** 
+
+You cannot call a **reactive value** if it's not inside of a **reactive function**.
+
+
+## More on Reactive Tools for Shiny
+
+- **Reactive values** *notify* (that changes are taking place)
+
+- **Reactive functions** *respond* (to the changes)
+
+- When we use `input$`, we are creating an input list that contains reactive values
+
+- There are 6 frequently used **reactive tools** that each build object(s) that will *respond* to changes in a set if reactive values (`input$`)
+
+
+1. `render*()` **render reactive output**
+
+    - builds an object that is tied to specific type of output
+
+```{r}
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  textInput(inputId = "question",
+              label = "Please write your thoughts here:"
+              ), #the comma is important
+  
+  # Show a plot of the generated distribution
+  verbatimTextOutput(outputId = "answer")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$answer <- renderPrint({
+    print(input$question)
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+
+2. `reactive()` **modify reactions**
+
+    - builds a reactive object called a "reactive expression" which acts like a new function
+    
+```{r}
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "size",
+              label = "Number of observations:",
+              min = 1,
+              max = 1e3,
+              value = 10), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "scatPlot")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$scatPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    dat <- reactive({
+      rnorm(input$size)
+    })
+    # draw the scatter plot
+    plot(cbind(dat(),dat()), col = 'darkgray', pch=16, main="Normally Distributed Data")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+    
+3. `isolate()` **prevent reactions**
+
+    - sets something to be a non-reactive value thus preventing values from being up-to-date
+
+```{r}
+ui <- fluidPage(
+ sliderInput(inputId = "num",
+  label = "Choose a number",
+  min = 1, 
+  max = 100,
+  value = 25),
+ 
+ textInput(inputId = "title",
+  label = "Write a title",
+  value = "Scatter Plot of Random Normal Values"),
+ 
+ plotOutput("scat")
+)
+
+server <- function(input, output) {
+ output$scat <- renderPlot({
+  plot(x=rnorm(input$num),y=rnorm(input$num), main = isolate({input$title}))
+ })
+}
+
+shinyApp(ui = ui, server = server, options = list(height = 800))
+```
+
+
+4. `observeEvent()` **trigger code**
+
+    - defines reactive values such that they trigger other code to run
+
+```{r}
+ui <- fluidPage(
+ 
+ textInput(inputId = "selection",
+  label = "Pick any number between 1 and 100"),
+ 
+ actionButton(inputId = "clicks",
+ label = "Select"),
+ 
+ verbatimTextOutput(outputId = "pc")
+)
+
+server <- function(input, output) {
+  observeEvent(input$clicks, {
+                output$pc <- renderPrint({ print(paste("the Computer was thinking of the number",sample(1:100,1)))})
+   })
+}
+
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+    
+5. `eventReactive()` **delay reactions**
+
+    - a reactive expression that only responds to specific events thus delaying reactivity
+
+```{r}
+ui <- fluidPage(
+ 
+ textInput(inputId = "selection",
+  label = "Pick any number between 1 and 100"),
+ 
+ actionButton(inputId = "clicks",
+ label = "Select"),
+ 
+ verbatimTextOutput(outputId = "pc")
+)
+
+server <- function(input, output) {
+  change <- eventReactive(input$clicks, { 
+    input$selection })
+  
+  output$pc <- renderPrint({ print(paste("the Computer was thinking of the number",sample(1:change(),1)))})
+}
+
+shinyApp(ui = ui, server = server, options = list(height = 500))
+```
+
+
+6. `reactiveValue()`  **create your own reactive values**
+
+    - creates a list of reactive values to manipulate
+
+```{r}
+library(tidyverse)
+mpg2 <- filter(mpg, manufacturer == "chevrolet" | manufacturer == "dodge" | manufacturer == "ford" | manufacturer =="jeep" | manufacturer =="lincoln" | manufacturer =="mercury" | manufacturer == "pontiac")
+
+ui <- fluidPage(
+ actionButton(inputId = "cyli", label = "Cylinders"),
+ 
+ actionButton(inputId = "driv", label = "Drivetrain"),
+
+ plotOutput("bars")
+)
+
+server <- function(input, output) {
+ rv <- reactiveValues(data = mpg2)
+ 
+ observeEvent(input$cyli, { rv$data <- table(mpg2$cyl) })
+ 
+ observeEvent(input$driv, { rv$data <- table(mpg2$drv) })
+ 
+ output$bars <- renderPlot({ barplot(rv$data, border="white", horiz = TRUE, xlab="frequency") })
+}
+
+shinyApp(ui = ui, server = server, options = list(height = 600))
+```
+
+
+## Task to Do
+
+1. Create a magic 8 ball Shiny app. The user must ask yes or no questions. The 8 ball responds with one of 20 possible answers. See https://en.wikipedia.org/wiki/Magic_8-Ball for the possible answers. 
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  textInput(inputId="question",label="Ask the magic 8 ball a question:"),
+  actionButton(inputId="click",label="Ask question"),
+  verbatimTextOutput(outputId="ans")
+)
+
+server <- function(input,output){
+  reply <- c("It is certain.","It is decidedly so.","Without a doubt.","Yes – definitely.",
+             "You may rely on it.","As I see it, yes.","Most likely.","Outlook good.","Yes.",
+             "Signs point to yes.","Reply hazy, try again.","Ask again later.","Better not tell you now.",
+             "Cannot predict now.","Concentrate and ask again.","Don't count on it.","My reply is no.",
+             "My sources say no.","Outlook not so good.","Very doubtful.")
+  observeEvent(input$click,{
+    output$ans <- renderPrint({print(sample(reply,1))})
+  })
+}
+
+shinyApp(ui=ui,server=server)
+```
+
+2. Add an image of the 8 ball to the shiny app in Problem 1.
+
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  img(src='220px-Magic8ball.jpg', align = "right"),
+  textInput(inputId="question",label="Ask the magic 8 ball a question:"),
+  actionButton(inputId="click",label="Ask question"),
+  verbatimTextOutput(outputId="ans")
+)
+
+server <- function(input,output){
+  reply <- c("It is certain.","It is decidedly so.","Without a doubt.","Yes – definitely.",
+             "You may rely on it.","As I see it, yes.","Most likely.","Outlook good.","Yes.",
+             "Signs point to yes.","Reply hazy, try again.","Ask again later.","Better not tell you now.",
+             "Cannot predict now.","Concentrate and ask again.","Don't count on it.","My reply is no.",
+             "My sources say no.","Outlook not so good.","Very doubtful.")
+  observeEvent(input$click,{
+    output$ans <- renderPrint({print(sample(reply,1))})
+  })
+}
+
+shinyApp(ui=ui,server=server)
+```
+
+3. There's something not quite right about the following Shiny app and its code. Fix it.
+
+```{r}
+library(shiny)
+ui <- fluidPage(
+  
+  # Sidebar with a slider input for number of bins 
+  sliderInput(inputId = "size",
+              label = "Number of observations:",
+              min = 1,
+              max = 1e6,
+              value = 30), #the comma is important
+  
+  # Show a plot of the generated distribution
+  plotOutput(outputId = "histPlot"),
+  verbatimTextOutput(outputId = "sumtable")
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  output$histPlot <- renderPlot({
+    
+    # draw the histogram plot
+    hist(rnorm(input$size), col = 'darkgray', xlab="", main="Normal Distribution")
+  })
+  
+  output$sumtable <- renderPrint({
+    summary(rnorm(input$size))
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server, options = list(height = 600))
+```
+
+
+4. For the `reactiveValues()` example, add another button such that it plots a single bar plot for the counts of the levels of both factors (not stacked but side-by-side).
+
+```{r}
+library(tidyverse)
+mpg2 <- filter(mpg, manufacturer == "chevrolet" | manufacturer == "dodge" | manufacturer == "ford" | manufacturer =="jeep" | manufacturer =="lincoln" | manufacturer =="mercury" | manufacturer == "pontiac")
+
+ui <- fluidPage(
+ actionButton(inputId = "cyli", label = "Cylinders"),
+ 
+ actionButton(inputId = "driv", label = "Drivetrain"),
+ 
+ actionButton(inputId = "both", label = "Both"),
+
+ plotOutput("bars")
+)
+
+server <- function(input, output) {
+ rv <- reactiveValues(data = mpg2)
+ drv1<-cbind(rep("drv",length(mpg2$drv)),mpg2$drv)
+ cyl1<-cbind(rep("cyl",length(mpg2$cyl)),mpg2$cyl)
+ comb<-rbind(cyl1,drv1)
+ 
+ observeEvent(input$cyli, { rv$data <- table(mpg2$cyl) })
+ 
+ observeEvent(input$driv, { rv$data <- table(mpg2$drv) })
+ 
+ observeEvent(input$both, { rv$data <- table(comb[,2],comb[,1]) })
+ 
+ output$bars <- renderPlot({ barplot(rv$data, border="white", horiz = TRUE, beside=TRUE, xlab="frequency") })
+}
+
+shinyApp(ui = ui, server = server, options = list(height = 600))
+```

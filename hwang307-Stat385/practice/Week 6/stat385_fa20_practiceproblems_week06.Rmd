@@ -1,0 +1,48 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Week 6 Practice Problems
+### Created by Christopher Kinson
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**#1** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Probability distributions, R Lists and data frames, R Writing your own functions, Vectorization) Create a custom function that detects outliers based on the Three Sigma Rule given a vector of data where `x <- iris$Sepal.Width`. Your function should return the values of the vector which are outliers.
+
+- Three Sigma Rule $|x-\bar{x}|>3 \cdot \hat{\sigma}$ 
+  
+```{r}
+TSRFunc <- function(x){
+  data.frame(value = x[abs(x-mean(x))>3*sd(x)],index = which(abs(x-mean(x))>3*sd(x)))
+}
+data <- iris$Sepal.Width
+TSRFunc(data)
+```
+
+**#2** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Probability distributions, R Lists and data frames, R Writing your own functions, Vectorization) Create a custom function that detects outliers based on the 1.5*IQR Rule given a vector of data where `x <- iris$Sepal.Width`. Your function should return the values of the vector which are outliers.
+
+- 1.5*IQR Rule $x<Q_1-1.5\cdot IQR$ or $x>Q_3+1.5 \cdot IQR$
+
+```{r}
+IQRFunc <- function(x){
+ data.frame(value = x[x<fivenum(x)[2] - 1.5*IQR(x) | x>fivenum(x)[4] + 1.5*IQR(x)],index = which(x<fivenum(x)[2] - 1.5*IQR(x) | x>fivenum(x)[4] + 1.5*IQR(x)))
+}
+data <- iris$Sepal.Width
+IQRFunc(data)
+```
+
+**#3** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Probability distributions, R Lists and data frames, R Writing your own functions, Vectorization) Create a custom function that detects outliers based on the Hampel Identifier given a vector of data where `x <- iris$Sepal.Width`. Your function should return the values of the vector which are outliers.
+
+- Hampel Identifier $|x-\tilde{x}|> 3 \cdot \tilde{\sigma}$  
+      - where $\tilde{x}$ is the median of $x$  
+      - where $\tilde{\sigma}=1.4826 \cdot \textrm{median}\{|x-\tilde{x}|\}$ is the median of the absolute deviation from the median (MADM or MAD) scale estimate
+
+```{r}
+HampelFunc <- function(x){
+  data.frame(value = x[abs(x-median(x))>3*1.4826*median(abs(x-median(x)))],index = which(abs(x-median(x))>3*1.4826*median(abs(x-median(x)))))
+}
+data <- iris$Sepal.Width
+HampelFunc(data)
+```

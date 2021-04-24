@@ -1,0 +1,54 @@
+---
+title: "STAT 385 Statistics Programming Methods - Fall 2020"
+output: html_document
+---
+## Week 8 Practice Problems Solutions
+### Created by Christopher Kinson
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**#1** (RMarkdown, R Objects, their modes, and attributes, R Lists and data frames, What is data, Importing data) Import the US State-level COVID-19 Historical Data from the New York Times and the Harvard's 2016 US Presidential Election by State Data using R and the data URLs [covid](https://uofi.box.com/shared/static/urzam55r2uyrzxwz34gf3i2jujviqbma.csv) and [election](https://uofi.box.com/shared/static/rsvhhskt1eb2q18od1wjscgs6646g93t.csv). Now, print the structure (or mode of each variable) for each dataset. Remove the columns that contain the year and version in the **election** data.
+
+- Data information: The **covid** dataset (a .csv file) contains the number of COVID-19 cases and deaths per state as a time series. The **election** data (a .csv file) contains how each state voted in the 2016 US Presidential Election and the number of votes each candidate received along with their political party affiliations. The candidate receiving the most votes can be considered as the winner of that state along with their political party. In other words, the state's political party affiliation is based on the candidate who who received the most votes for that state.
+
+```{r prob1}
+covid <- read.csv("https://uofi.box.com/shared/static/urzam55r2uyrzxwz34gf3i2jujviqbma.csv")
+str(covid)
+
+election <- read.csv("https://uofi.box.com/shared/static/rsvhhskt1eb2q18od1wjscgs6646g93t.csv")
+election <- election[,-c(1,13)]
+str(election)
+```
+
+
+**#2** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with the imported **covid data**, answer the following question: Which states are in the top 10 for the largest number of positive cases of COVID-19 (at its most recent date)? *Your question should be answered in bold words in Markdown, and the resulting code and data print out should serve as evidence.*
+
+**The states in the top 10 for the largest number of positive cases of COVID-19 (at its most recent date of October 1, 2020) are in decreasing order: California, Texas, Florida, New York, Georgia, Illinois, Arizona, North Carolina, New Jersey, and Tennessee.**
+```{r prob2}
+range(covid$date)
+covid2 <- covid[covid$date==range(covid$date)[2],]
+covid2[order(covid2$cases, decreasing = TRUE)[1:10],]
+```
+
+
+**#3** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Combine the imported **covid** data with the imported **election** data using an inner join such that there is only one candidate (the one who received the most votes) for each state and only states that are common to both datasets are stored in the combined data. Now print the first 10 observations of the combined data. *Hint: Keep in mind that this inner join will only make sense for the most recent date of COVID-19 data.*
+
+```{r prob3}
+states = unique(election$state)
+election2 = NULL
+for(i in 1:length(states)){
+  maxvotes = max(election[election$state==states[i],"candidatevotes"])
+  election2 = rbind(election2,election[election$candidatevotes==maxvotes, ])
+}
+combined = merge(covid2, election2, by = "state")  
+head(combined, 10)
+```
+
+
+**#4** (RMarkdown, R Objects, their modes, and attributes, R Simple manipulations and Numbers and vectors, Object arrangement, R Arrays and matrices, R Lists and data frames, R Grouping, loops, and conditional execution, Apply family of functions, Vectorization, Data wrangling) Beginning with the combined data in **Problem 3**, answer the following question: What are the political party affiliations for the states that are in the top 10 for the largest number of positive cases of COVID-19 (at its most recent date)? *Your question should be answered in words in Markdown, and the resulting code and data print out should serve as evidence.* **Be sure to print out only the following columns: state, date, cases, deaths, and party.**
+
+```{r prob4}
+combined[order(combined$cases, decreasing = TRUE)[1:10],c("state", "date", "cases", "deaths", "party")]
+```
